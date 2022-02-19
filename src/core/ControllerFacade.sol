@@ -5,7 +5,7 @@ import {Ownable} from "../utils/Ownable.sol";
 import {IController} from "./IController.sol";
 import {IControllerFacade} from "./IControllerFacade.sol";
 
-contract ControllerAggregator is Ownable, IControllerFacade {
+contract ControllerFacade is Ownable, IControllerFacade {
     mapping(address => bool) public isSwapAllowed;
     mapping(address => IController) public controllerFor;
 

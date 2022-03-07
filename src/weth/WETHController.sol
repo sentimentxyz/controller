@@ -2,12 +2,17 @@
 pragma solidity ^0.8.10;
 
 import {IController} from "../core/IController.sol";
+import {Ownable} from "../utils/Ownable.sol";
 
-contract WETHController is IController {
+contract WETHController is IController, Ownable {
     bytes4 constant DEPOSIT = 0xd0e30db0;
     bytes4 constant WITHDRAW = 0x2e1a7d4d;
-    address[] weth = [ 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 ]; // WETH9
+    address[] public weth; // WETH9
     
+    constructor(address wEth) Ownable(msg.sender) {
+        weth.push(wEth);
+    }
+
     function canCall(
         address,
         bytes calldata data
@@ -17,5 +22,10 @@ contract WETHController is IController {
         if(sig == DEPOSIT) return (true, weth, new address[](0));
         if(sig == WITHDRAW) return (true, new address[](0), weth);
         return (false, new address[](0), new address[](0));
+    }
+
+    // Admin
+    function setWEthAddress(address wEth) adminOnly external {
+        weth[0] = wEth;
     }
 }

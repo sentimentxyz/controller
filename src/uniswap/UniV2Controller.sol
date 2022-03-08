@@ -19,7 +19,9 @@ contract UniV2Controller is IController {
     }
 
     function canCall(address, bytes calldata data) 
-        external view returns (bool, address[] memory, address[] memory)
+        external
+        view
+        returns (bool, address[] memory, address[] memory)
     {
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
@@ -41,7 +43,7 @@ contract UniV2Controller is IController {
             );
         }
 
-        if(sig == SWAP_EXACT_ETH_FOR_TOKENS
+        if (sig == SWAP_EXACT_ETH_FOR_TOKENS
             || sig == SWAP_ETH_FOR_EXACT_TOKENS) 
         {
             (, address[] memory path,,) 
@@ -56,7 +58,7 @@ contract UniV2Controller is IController {
             );
         }
 
-        if(sig == SWAP_TOKENS_FOR_EXACT_ETH
+        if (sig == SWAP_TOKENS_FOR_EXACT_ETH
             || sig == SWAP_EXACT_TOKENS_FOR_ETH) 
         {
             (, address[] memory path,,) 

@@ -2,5 +2,5 @@
 pragma solidity ^0.8.10;
 
 interface IStableSwapPool {
-    function coins(uint i) external view returns (address);
+    function coins(uint256 i) external view returns (address);
 }

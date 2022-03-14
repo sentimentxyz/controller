@@ -5,9 +5,9 @@ import {IController} from "../core/IController.sol";
 import {IStableSwapPool} from "./IStableSwapPool.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 
-contract CurveController is IController {
+contract StableSwapController is IController {
     IControllerFacade public immutable controllerFacade;
-    bytes4 public constant EXCHANGE = 0x394747c5;
+    bytes4 public constant EXCHANGE = 0x3df02124;
 
     constructor(IControllerFacade _controllerFacade) {
         controllerFacade = _controllerFacade;
@@ -23,23 +23,16 @@ contract CurveController is IController {
             return (false, new address[](0), new address[](0));
 
         // decode data
-        (uint256 i, uint256 j,,,bool useEth) = abi.decode(
+        // TODO Save gas by directly decoding to uint and avoid casting later
+        (int128 i, int128 j,,) = abi.decode(
             data[4:],
-            (uint256, uint256, uint256, uint256, bool)
+            (int128, int128, uint256, uint256)
         );
 
         address[] memory tokensIn = new address[](1);
-        tokensIn[0] = IStableSwapPool(target).coins(j);     
-        
-        if (useEth) 
-            return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
-                tokensIn,
-                new address[](0)
-            );
-
         address[] memory tokensOut = new address[](1);
-        tokensOut[0] = IStableSwapPool(target).coins(i);
+        tokensIn[0] = IStableSwapPool(target).coins(uint128(j));     
+        tokensOut[0] = IStableSwapPool(target).coins(uint128(i));
         
         return (
             controllerFacade.isSwapAllowed(tokensIn[0]), 

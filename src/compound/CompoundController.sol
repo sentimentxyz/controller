@@ -26,9 +26,13 @@ contract CompoundController is IController {
             return(true, tokensIn, tokensOut);
         }
         if(sig == REDEEM) {
-            tokensIn[0] = ICToken(target).underlying();
             tokensOut[0] = target;
-            return(true, tokensIn, tokensOut);
+            try ICToken(target).underlying() returns (address tokenIn) {
+                tokensIn[0] = tokenIn;
+                return(true, tokensIn, tokensOut);
+            } catch {
+                return(true, new address[](0), tokensOut);
+            }
         }
         return (false, new address[](0), new address[](0));
     }

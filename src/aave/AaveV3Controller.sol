@@ -5,7 +5,7 @@ import {IController} from "../core/IController.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IPoolV3} from "./IPoolV3.sol";
 
-contract AaveV2Controller is IController {
+contract AaveV3Controller is IController {
     bytes4 public constant SUPPLY = 0x617ba037;
     bytes4 public constant WITHDRAW = 0x69328dec;
 

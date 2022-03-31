@@ -14,6 +14,7 @@ contract WETHController is IController {
 
     function canCall(
         address,
+        bool,
         bytes calldata data
     ) external view returns (bool, address[] memory, address[] memory)
     {

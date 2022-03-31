@@ -13,7 +13,7 @@ contract AaveEthController is IController {
         tokens.push(_aWeth);
     }
 
-    function canCall(address, bytes calldata data)
+    function canCall(address, bool, bytes calldata data)
         external
         view
         returns (bool, address[] memory, address[] memory)

@@ -20,10 +20,11 @@ contract AaveV2Controller is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        if (bytes4(data) == SUPPLY) {
-            (address asset,,,) = abi.decode(
+        bytes4 sig = bytes4(data);
+        if (sig == SUPPLY) {
+            address asset = abi.decode(
                 data[4:],
-                (address, uint256, address, uint16)
+                (address)
             );
             address[] memory tokensIn = new address[](1);
             address[] memory tokensOut = new address[](1);
@@ -34,20 +35,17 @@ contract AaveV2Controller is IController {
                 tokensIn,
                 tokensOut
             );
-        } else if (bytes4(data) == WITHDRAW) {
-            (address asset,,) = abi.decode(
+        }
+        if (sig == WITHDRAW) {
+            address asset = abi.decode(
                 data[4:],
-                (address, uint256, address)
+                (address)
             );
             address[] memory tokensIn = new address[](1);
             address[] memory tokensOut = new address[](1);
             tokensIn[0] = asset;
             tokensOut[0] = IPoolV3(target).getReserveData(asset).aTokenAddress;
-            return (
-                true,
-                tokensIn,
-                tokensOut
-            );
+            return (true, tokensIn, tokensOut);
         }
         return (false, new address[](0), new address[](0));
     }

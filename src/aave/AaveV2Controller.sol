@@ -25,11 +25,12 @@ contract AaveV2Controller is IController {
         external
         view
         returns (bool, address[] memory, address[] memory)
-    {
-        if (bytes4(data) == DEPOSIT) {
-            (address asset,,,) = abi.decode(
+    { 
+        bytes4 sig = bytes4(data);
+        if (sig == DEPOSIT) {
+            address asset = abi.decode(
                 data[4:],
-                (address, uint256, address, uint16)
+                (address)
             );
             address[] memory tokensIn = new address[](1);
             address[] memory tokensOut = new address[](1);
@@ -40,10 +41,11 @@ contract AaveV2Controller is IController {
                 tokensIn,
                 tokensOut
             );
-        } else if (bytes4(data) == WITHDRAW) {
-            (address asset,,) = abi.decode(
+        }
+        if (sig == WITHDRAW) {
+            address asset = abi.decode(
                 data[4:],
-                (address, uint256, address)
+                (address)
             );
             address[] memory tokensIn = new address[](1);
             address[] memory tokensOut = new address[](1);

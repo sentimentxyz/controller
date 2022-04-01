@@ -6,11 +6,13 @@ interface IControllerFacade {
     
     function canCall(
         address target,
+        bool useEth,
         bytes calldata data
     ) external view returns (bool, address[] memory, address[] memory);
     
     function canCallBatch(
         address[] calldata target,
+        bool[] calldata useEth,
         bytes[] calldata data
     ) external view returns (bool, address[] memory, address[] memory);
 }

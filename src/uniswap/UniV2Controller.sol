@@ -18,7 +18,7 @@ contract UniV2Controller is IController {
         controller = _controller;
     }
 
-    function canCall(address, bytes calldata data) 
+    function canCall(address, bool, bytes calldata data) 
         external
         view
         returns (bool, address[] memory, address[] memory)

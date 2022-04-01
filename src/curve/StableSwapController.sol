@@ -13,7 +13,7 @@ contract StableSwapController is IController {
         controllerFacade = _controllerFacade;
     }
 
-    function canCall(address target, bytes calldata data) 
+    function canCall(address target, bool, bytes calldata data) 
         external
         view
         returns (bool, address[] memory, address[] memory)  

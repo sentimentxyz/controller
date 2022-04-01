@@ -15,7 +15,7 @@ contract AaveV3Controller is IController {
         controllerFacade = _controller;
     }
 
-    function canCall(address target, bytes calldata data)
+    function canCall(address target, bool, bytes calldata data)
         external
         view
         returns (bool, address[] memory, address[] memory)

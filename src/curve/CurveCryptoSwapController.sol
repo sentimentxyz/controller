@@ -13,7 +13,7 @@ contract CurveCryptoSwapController is IController {
         controllerFacade = _controllerFacade;
     }
 
-    function canCall(address target, bytes calldata data) 
+    function canCall(address target, bool useEth, bytes calldata data) 
         external
         view
         returns (bool, address[] memory, address[] memory)  
@@ -23,9 +23,9 @@ contract CurveCryptoSwapController is IController {
             return (false, new address[](0), new address[](0));
 
         // decode data
-        (uint256 i, uint256 j,,,bool useEth) = abi.decode(
+        (uint256 i, uint256 j) = abi.decode(
             data[4:],
-            (uint256, uint256, uint256, uint256, bool)
+            (uint256, uint256)
         );
 
         address[] memory tokensIn = new address[](1);

@@ -15,13 +15,15 @@ contract ControllerFacade is Ownable, IControllerFacade {
 
     function canCall(
         address target,
+        bool useEth,
         bytes calldata data
     ) external view returns (bool, address[] memory, address[] memory) {
-        return controllerFor[target].canCall(target, data);
+        return controllerFor[target].canCall(target, useEth, data);
     }
 
     function canCallBatch(
         address[] calldata target,
+        bool[] calldata useEth,
         bytes[] calldata data
     ) external view returns (bool, address[] memory, address[] memory) {
         uint lenMinusOne = target.length - 1;
@@ -31,11 +33,18 @@ contract ControllerFacade is Ownable, IControllerFacade {
                 return(false, new address[](0), new address[](0));
         }
 
-        return controllerFor[target[lenMinusOne]].canCall(target[lenMinusOne], data[lenMinusOne]);
+        return controllerFor[target[lenMinusOne]].canCall(
+            target[lenMinusOne],
+            useEth[lenMinusOne],
+            data[lenMinusOne]
+        );
     }
 
     // Admin Only
-    function updateController(address target, IController controller) external adminOnly {
+    function updateController(address target, IController controller)
+        external 
+        adminOnly 
+    {
         controllerFor[target] = controller;
         emit UpdateController(target, address(controller));
     }

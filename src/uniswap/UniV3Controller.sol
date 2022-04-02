@@ -10,10 +10,10 @@ contract UniV3Controller is IController {
     using BytesLib for bytes;
     
     bytes4 constant MULTICALL = 0xac9650d8;
-    bytes4 constant EXACTOUTPUTSINGLE = 0xdb3e2198;
+    bytes4 constant EXACTOUTPUTSINGLE = 0x5023b4df;
     bytes4 constant REFUNDETH = 0x12210e8a;
     bytes4 constant UNWRAPETH = 0x49404b7c;
-    bytes4 constant EXACTINPUTSINGLE = 0x414bf389;
+    bytes4 constant EXACTINPUTSINGLE = 0x04e45aaf;
 
     IControllerFacade public immutable controllerFacade;
 
@@ -44,14 +44,36 @@ contract UniV3Controller is IController {
 
             // Handle case when first function call is exactOutputSingle
             if (bytes4(multiData[0]) == EXACTOUTPUTSINGLE)
-                return canCallExactOutputSingle(multiData, useEth, multiData[0]);
+                return canCallMultiExactOutputSingle(multiData, useEth, multiData[0]);
 
             // Handle case when first function call is exactInputSingle
             if (bytes4(multiData[0]) == EXACTINPUTSINGLE)
                 return canCallMultiExactInputSingle(multiData, multiData[0]);
         }
 
-        // Handle flow when sig is exactInputSingle
+        // Swap ERC20 <-> ERC20
+        if (sig == EXACTOUTPUTSINGLE) {
+            
+            // Decode Params
+            IV3SwapRouter.ExactOutputSingleParams memory params = abi.decode(
+                data[4:],
+                (IV3SwapRouter.ExactOutputSingleParams)
+            );
+            
+            address[] memory tokensIn = new address[](1);
+            address[] memory tokensOut = new address[](1);
+            
+            tokensIn[0] = params.tokenOut;
+            tokensOut[0] = params.tokenIn;
+            
+            return (
+                controllerFacade.isSwapAllowed(tokensIn[0]),
+                tokensIn,
+                tokensOut
+            );
+        }
+
+        // Swap ETH <-> ERC20 and ERC20 <-> ERC20
         if (sig == EXACTINPUTSINGLE) {
 
             // Decode params
@@ -81,10 +103,11 @@ contract UniV3Controller is IController {
                 tokensOut
             );
         }
+
         return (false, new address[](0), new address[](0));
     }
 
-    function canCallExactOutputSingle(
+    function canCallMultiExactOutputSingle(
         bytes[] memory multiData,
         bool useEth,
         bytes memory data
@@ -115,19 +138,6 @@ contract UniV3Controller is IController {
             address[] memory tokensOut = new address[](1);
             tokensOut[0] = params.tokenIn;
             return (true, new address[](0), tokensOut);
-        }
-        
-        // Swapping ERC20 <-> ERC20
-        if (multiData.length == 1) {
-            address[] memory tokensIn = new address[](1);
-            address[] memory tokensOut = new address[](1);
-            tokensIn[0] = params.tokenOut;
-            tokensOut[0] = params.tokenIn;
-            return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
-                tokensIn,
-                tokensOut
-            );
         }
 
         return (false, new address[](0), new address[](0));

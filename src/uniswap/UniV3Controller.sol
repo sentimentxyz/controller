@@ -26,88 +26,97 @@ contract UniV3Controller is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        // Decode signature
-        bytes4 sig = bytes4(data);
+        bytes4 sig = bytes4(data); // Slice function selector
 
-        // Handle flow when sig is multicall
-        if (sig == MULTICALL) {
-            
-            // Decode multiple function calls
-            bytes[] memory multiData = abi.decode(
-                data[4:],
-                (bytes[])
-            );
-            
-            // Return False if more than two functions are called
-            if (multiData.length > 2) 
-                return (false, new address[](0), new address[](0));
-
-            // Handle case when first function call is exactOutputSingle
-            if (bytes4(multiData[0]) == EXACT_OUTPUT_SINGLE)
-                return canCallMultiExactOutputSingle(multiData, useEth);
-
-            // Handle case when first function call is exactInputSingle
-            if (bytes4(multiData[0]) == EXACT_INPUT_SINGLE)
-                return canCallMultiExactInputSingle(multiData);
-        }
-
-        // Swap ERC20 <-> ERC20
-        if (sig == EXACT_OUTPUT_SINGLE) {
-            
-            // Decode Params
-            ISwapRouterV3.ExactOutputSingleParams memory params = abi.decode(
-                data[4:],
-                (ISwapRouterV3.ExactOutputSingleParams)
-            );
-            
-            address[] memory tokensIn = new address[](1);
-            address[] memory tokensOut = new address[](1);
-            
-            tokensIn[0] = params.tokenOut;
-            tokensOut[0] = params.tokenIn;
-            
-            return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
-                tokensIn,
-                tokensOut
-            );
-        }
-
-        // Swap ETH <-> ERC20 and ERC20 <-> ERC20
-        if (sig == EXACT_INPUT_SINGLE) {
-
-            // Decode params
-            ISwapRouterV3.ExactInputSingleParams memory params = abi.decode(
-                data[4:],
-                (ISwapRouterV3.ExactInputSingleParams)
-            );
-            
-            address[] memory tokensIn = new address[](1);
-            tokensIn[0] = params.tokenOut;
-            
-            // If swapping Eth <-> ERC20
-            if (useEth) {
-                return (
-                    controllerFacade.isSwapAllowed(tokensIn[0]),
-                    tokensIn,
-                    new address[](0)
-                );
-            }
-            
-            address[] memory tokensOut = new address[](1);
-            tokensOut[0] = params.tokenIn;
-            
-            return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
-                tokensIn,
-                tokensOut
-            );
-        }
-
+        if (sig == MULTICALL) parseMultiCall(data[4:], useEth);
+        if (sig == EXACT_OUTPUT_SINGLE) parseExactOutputSingle(data[4:]);
+        if (sig == EXACT_INPUT_SINGLE) parseExactInputSingle(data[4:], useEth);
         return (false, new address[](0), new address[](0));
     }
 
-    function canCallMultiExactOutputSingle(
+    function parseMultiCall(bytes calldata data, bool useEth) 
+        internal 
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Decompose function calls
+        bytes[] memory calls = abi.decode(data, (bytes[]));
+
+        // Multicalls with > 2 calls are treated as malformed data
+        if (calls.length > 2) 
+            return (false, new address[](0), new address[](0));
+        
+        bytes4 sig = bytes4(calls[0]);
+         
+        // Handle case when first function call is exactOutputSingle
+        if (sig == EXACT_OUTPUT_SINGLE)
+            return parseExactOutputSingleMulticall(calls, useEth);
+
+        // Handle case when first function call is exactInputSingle
+        if (sig == EXACT_INPUT_SINGLE)
+            return parseExactInputSingleMulticall(calls);
+        
+        return (false, new address[](0), new address[](0));
+    }
+
+    function parseExactOutputSingle(bytes calldata data) 
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Decode Params
+        ISwapRouterV3.ExactOutputSingleParams memory params = abi.decode(
+            data,
+            (ISwapRouterV3.ExactOutputSingleParams)
+        );
+        
+        address[] memory tokensIn = new address[](1);
+        address[] memory tokensOut = new address[](1);
+        
+        tokensIn[0] = params.tokenOut;
+        tokensOut[0] = params.tokenIn;
+        
+        return (
+            controllerFacade.isSwapAllowed(tokensIn[0]),
+            tokensIn,
+            tokensOut
+        );
+    }
+
+    function parseExactInputSingle(bytes calldata data, bool useEth)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Decode swap params
+        ISwapRouterV3.ExactInputSingleParams memory params = abi.decode(
+            data,
+            (ISwapRouterV3.ExactInputSingleParams)
+        );
+        
+        address[] memory tokensIn = new address[](1);
+        tokensIn[0] = params.tokenOut;
+        
+        // If swapping ETH <-> ERC20
+        if (useEth) {
+            return (
+                controllerFacade.isSwapAllowed(tokensIn[0]), 
+                tokensIn, 
+                new address[](0)
+            );
+        }
+        
+        address[] memory tokensOut = new address[](1);
+        tokensOut[0] = params.tokenIn;
+        
+        return (
+            controllerFacade.isSwapAllowed(tokensIn[0]),
+            tokensIn,
+            tokensOut
+        );   
+    }
+
+    function parseExactOutputSingleMulticall(
         bytes[] memory multiData,
         bool useEth
     )
@@ -142,7 +151,7 @@ contract UniV3Controller is IController {
         return (false, new address[](0), new address[](0));
     }
 
-    function canCallMultiExactInputSingle(
+    function parseExactInputSingleMulticall(
         bytes[] memory multiData
     ) 
         internal 

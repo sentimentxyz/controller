@@ -44,11 +44,11 @@ contract UniV3Controller is IController {
 
             // Handle case when first function call is exactOutputSingle
             if (bytes4(multiData[0]) == EXACTOUTPUTSINGLE)
-                return canCallMultiExactOutputSingle(multiData, useEth, multiData[0]);
+                return canCallMultiExactOutputSingle(multiData, useEth);
 
             // Handle case when first function call is exactInputSingle
             if (bytes4(multiData[0]) == EXACTINPUTSINGLE)
-                return canCallMultiExactInputSingle(multiData, multiData[0]);
+                return canCallMultiExactInputSingle(multiData);
         }
 
         // Swap ERC20 <-> ERC20
@@ -77,9 +77,9 @@ contract UniV3Controller is IController {
         if (sig == EXACTINPUTSINGLE) {
 
             // Decode params
-            IV3SwapRouter.ExactOutputSingleParams memory params = abi.decode(
+            IV3SwapRouter.ExactInputSingleParams memory params = abi.decode(
                 data[4:],
-                (IV3SwapRouter.ExactOutputSingleParams)
+                (IV3SwapRouter.ExactInputSingleParams)
             );
             
             address[] memory tokensIn = new address[](1);
@@ -109,16 +109,15 @@ contract UniV3Controller is IController {
 
     function canCallMultiExactOutputSingle(
         bytes[] memory multiData,
-        bool useEth,
-        bytes memory data
-    ) 
+        bool useEth
+    )
         internal 
         view 
         returns (bool, address[] memory, address[] memory) 
     {
         // remove sig from data and decode params
         IV3SwapRouter.ExactOutputSingleParams memory params = abi.decode(
-            data.slice(4, data.length - 4),
+            multiData[0].slice(4, multiData[0].length - 4),
             (IV3SwapRouter.ExactOutputSingleParams)
         );
         
@@ -144,8 +143,7 @@ contract UniV3Controller is IController {
     }
 
     function canCallMultiExactInputSingle(
-        bytes[] memory multiData,
-        bytes memory data
+        bytes[] memory multiData
     ) 
         internal 
         pure
@@ -154,7 +152,7 @@ contract UniV3Controller is IController {
         // Swap ERC20 <-> ETH
         if (bytes4(multiData[1]) == UNWRAPETH) {
             IV3SwapRouter.ExactInputSingleParams memory params = abi.decode(
-                data.slice(4, data.length - 4),
+                multiData[0].slice(4, multiData[0].length - 4),
                 (IV3SwapRouter.ExactInputSingleParams)
             );
             

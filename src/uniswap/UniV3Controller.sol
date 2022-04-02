@@ -2,37 +2,18 @@
 pragma solidity ^0.8.11;
 
 import {IController} from "../core/IController.sol";
+import {IV3SwapRouter} from "./IV3SwapRouter.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
-import {BytesLib} from "@byteslib/contracts/BytesLib.sol";
+import {BytesLib} from "../../lib/solidity-bytes-utils/contracts/BytesLib.sol";
 
 contract UniV3Controller is IController {
     using BytesLib for bytes;
     
-    bytes4 constant MULTICALL = 0xdb3e2198;
+    bytes4 constant MULTICALL = 0xac9650d8;
     bytes4 constant EXACTOUTPUTSINGLE = 0xdb3e2198;
     bytes4 constant REFUNDETH = 0x12210e8a;
     bytes4 constant UNWRAPETH = 0x49404b7c;
     bytes4 constant EXACTINPUTSINGLE = 0x414bf389;
-
-    struct ExactOutputSingleParams {
-        address tokenIn;
-        address tokenOut;
-        uint24 fee;
-        address recipient;
-        uint256 amountOut;
-        uint256 amountInMaximum;
-        uint160 sqrtPriceLimitX96;
-    }
-
-    struct ExactInputSingleParams {
-        address tokenIn;
-        address tokenOut;
-        uint24 fee;
-        address recipient;
-        uint256 amountIn;
-        uint256 amountOutMinimum;
-        uint160 sqrtPriceLimitX96;
-    }
 
     IControllerFacade public immutable controllerFacade;
 
@@ -74,9 +55,9 @@ contract UniV3Controller is IController {
         if (sig == EXACTINPUTSINGLE) {
 
             // Decode params
-            ExactOutputSingleParams memory params = abi.decode(
+            IV3SwapRouter.ExactOutputSingleParams memory params = abi.decode(
                 data[4:],
-                (ExactOutputSingleParams)
+                (IV3SwapRouter.ExactOutputSingleParams)
             );
             
             address[] memory tokensIn = new address[](1);
@@ -113,9 +94,9 @@ contract UniV3Controller is IController {
         returns (bool, address[] memory, address[] memory) 
     {
         // remove sig from data and decode params
-        ExactOutputSingleParams memory params = abi.decode(
+        IV3SwapRouter.ExactOutputSingleParams memory params = abi.decode(
             data.slice(4, data.length - 4),
-            (ExactOutputSingleParams)
+            (IV3SwapRouter.ExactOutputSingleParams)
         );
         
         // Swapping Eth <-> ERC20
@@ -162,9 +143,9 @@ contract UniV3Controller is IController {
     {   
         // Swap ERC20 <-> ETH
         if (bytes4(multiData[1]) == UNWRAPETH) {
-            ExactInputSingleParams memory params = abi.decode(
+            IV3SwapRouter.ExactInputSingleParams memory params = abi.decode(
                 data.slice(4, data.length - 4),
-                (ExactInputSingleParams)
+                (IV3SwapRouter.ExactInputSingleParams)
             );
             
             address[] memory tokensOut = new address[](1);

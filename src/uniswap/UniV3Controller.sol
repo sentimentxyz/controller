@@ -10,10 +10,10 @@ contract UniV3Controller is IController {
     using BytesLib for bytes;
     
     bytes4 constant MULTICALL = 0xac9650d8;
-    bytes4 constant EXACTOUTPUTSINGLE = 0x5023b4df;
-    bytes4 constant REFUNDETH = 0x12210e8a;
-    bytes4 constant UNWRAPETH = 0x49404b7c;
-    bytes4 constant EXACTINPUTSINGLE = 0x04e45aaf;
+    bytes4 constant REFUUND_ETH = 0x12210e8a;
+    bytes4 constant UNWRAP_ETH = 0x49404b7c;
+    bytes4 constant EXACT_INPUT_SINGLE = 0x04e45aaf;
+    bytes4 constant EXACT_OUTPUT_SINGLE = 0x5023b4df;
 
     IControllerFacade public immutable controllerFacade;
 
@@ -43,16 +43,16 @@ contract UniV3Controller is IController {
                 return (false, new address[](0), new address[](0));
 
             // Handle case when first function call is exactOutputSingle
-            if (bytes4(multiData[0]) == EXACTOUTPUTSINGLE)
+            if (bytes4(multiData[0]) == EXACT_OUTPUT_SINGLE)
                 return canCallMultiExactOutputSingle(multiData, useEth);
 
             // Handle case when first function call is exactInputSingle
-            if (bytes4(multiData[0]) == EXACTINPUTSINGLE)
+            if (bytes4(multiData[0]) == EXACT_INPUT_SINGLE)
                 return canCallMultiExactInputSingle(multiData);
         }
 
         // Swap ERC20 <-> ERC20
-        if (sig == EXACTOUTPUTSINGLE) {
+        if (sig == EXACT_OUTPUT_SINGLE) {
             
             // Decode Params
             ISwapRouterV3.ExactOutputSingleParams memory params = abi.decode(
@@ -74,7 +74,7 @@ contract UniV3Controller is IController {
         }
 
         // Swap ETH <-> ERC20 and ERC20 <-> ERC20
-        if (sig == EXACTINPUTSINGLE) {
+        if (sig == EXACT_INPUT_SINGLE) {
 
             // Decode params
             ISwapRouterV3.ExactInputSingleParams memory params = abi.decode(
@@ -122,7 +122,7 @@ contract UniV3Controller is IController {
         );
         
         // Swapping Eth <-> ERC20
-        if (useEth && bytes4(multiData[1]) == REFUNDETH) {
+        if (useEth && bytes4(multiData[1]) == REFUUND_ETH) {
             address[] memory tokensIn = new address[](1);
             tokensIn[0] = params.tokenOut;
             return (
@@ -133,7 +133,7 @@ contract UniV3Controller is IController {
         }
 
         // Swapping ERC20 <-> ETH   
-        if (bytes4(multiData[1]) == UNWRAPETH) {
+        if (bytes4(multiData[1]) == UNWRAP_ETH) {
             address[] memory tokensOut = new address[](1);
             tokensOut[0] = params.tokenIn;
             return (true, new address[](0), tokensOut);
@@ -150,7 +150,7 @@ contract UniV3Controller is IController {
         returns (bool, address[] memory, address[] memory) 
     {   
         // Swap ERC20 <-> ETH
-        if (bytes4(multiData[1]) == UNWRAPETH) {
+        if (bytes4(multiData[1]) == UNWRAP_ETH) {
             ISwapRouterV3.ExactInputSingleParams memory params = abi.decode(
                 multiData[0].slice(4, multiData[0].length - 4),
                 (ISwapRouterV3.ExactInputSingleParams)

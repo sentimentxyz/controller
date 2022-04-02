@@ -28,9 +28,11 @@ contract UniV3Controller is IController {
     {
         bytes4 sig = bytes4(data); // Slice function selector
 
-        if (sig == MULTICALL) parseMultiCall(data[4:], useEth);
-        if (sig == EXACT_OUTPUT_SINGLE) parseExactOutputSingle(data[4:]);
-        if (sig == EXACT_INPUT_SINGLE) parseExactInputSingle(data[4:], useEth);
+        if (sig == MULTICALL) return parseMultiCall(data[4:], useEth);
+        if (sig == EXACT_OUTPUT_SINGLE) 
+            return parseExactOutputSingle(data[4:]);
+        if (sig == EXACT_INPUT_SINGLE) 
+            return parseExactInputSingle(data[4:], useEth);
         return (false, new address[](0), new address[](0));
     }
 

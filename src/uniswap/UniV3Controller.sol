@@ -3,7 +3,7 @@ pragma solidity ^0.8.11;
 
 import {ISwapRouterV3} from "./ISwapRouterV3.sol";
 import {IController} from "../core/IController.sol";
-import {BytesLib} from "@byteslib/contracts/BytesLib.sol";
+import {BytesLib} from "solidity-bytes-utils/BytesLib.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 
 contract UniV3Controller is IController {

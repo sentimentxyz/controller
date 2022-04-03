@@ -1,2 +1,2 @@
-@ds-test/=lib/ds-test/
-@byteslib/=lib/solidity-bytes-utils/
+ds-test/=lib/ds-test/src/
+solidity-bytes-utils/=lib/solidity-bytes-utils/contracts/

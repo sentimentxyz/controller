@@ -41,15 +41,21 @@ contract CurveCryptoSwapController is IController {
             data[4:],
             (uint256[3], uint256)
         );
-            
-        address[] memory tokensIn = new address[](1);
-        address[] memory tokensOut = new address[](3);
-            
-        tokensIn[0] = IStableSwapPool(target).token();
-        for (uint i=0; i<3; i++)
-            if (amounts[i] > 0) 
-                tokensOut[i] = IStableSwapPool(target).coins(i);
+        uint count; 
         
+        for (uint i=0; i<3; i++)
+            if (amounts[i] > 0) count++;
+        
+        address[] memory tokensOut = new address[](count);
+        count = 0;
+        for (uint i; i<3; i++)
+            if (amounts[i] > 0) {
+                tokensOut[count] = IStableSwapPool(target).coins(i);
+                count++;
+            }
+        
+        address[] memory tokensIn = new address[](1);
+        tokensIn[0] = IStableSwapPool(target).token();    
         return (true, tokensIn, tokensOut);
     }
 
@@ -84,14 +90,20 @@ contract CurveCryptoSwapController is IController {
             data[4:],
             (uint256, uint256[3])
         );
-            
-        address[] memory tokensIn = new address[](3);
-        address[] memory tokensOut = new address[](1);
-            
-        for (uint i=0; i < 3; i++)
-            if (amounts[i] > 0) 
-                tokensIn[i] = IStableSwapPool(target).coins(i);
+
+        uint count; 
+        for (uint i=0; i<3; i++)
+            if (amounts[i] > 0) count++;
         
+        address[] memory tokensIn = new address[](count);
+        count = 0;
+        for (uint i; i<3; i++)
+            if (amounts[i] > 0) {
+                tokensIn[count] = IStableSwapPool(target).coins(i);
+                count++;
+            }
+        
+        address[] memory tokensOut = new address[](1);
         tokensOut[0] = IStableSwapPool(target).token();
         return (true, tokensIn, tokensOut);
     }

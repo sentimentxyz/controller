@@ -56,7 +56,7 @@ contract StableSwapController is IController {
         
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = IStableSwapPool(target).token();    
-        return (true, tokensIn, tokensOut);
+        return (controllerFacade.isSwapAllowed(tokensIn[0]), tokensIn, tokensOut);
     }
 
     function canRemoveLiquidityOneCoin(address target, bytes calldata data)
@@ -64,9 +64,9 @@ contract StableSwapController is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        (,uint256 i, uint256 min_amount) = abi.decode(
+        (,int128 i, uint256 min_amount) = abi.decode(
             data[4:],
-            (uint256, uint256, uint256)
+            (uint256, int128, uint256)
         );
             
         if (min_amount == 0)
@@ -75,7 +75,7 @@ contract StableSwapController is IController {
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
         
-        tokensIn[0] = IStableSwapPool(target).coins(i);
+        tokensIn[0] = IStableSwapPool(target).coins(uint128(i));
         tokensOut[0] = IStableSwapPool(target).token();
 
         return (true, tokensIn, tokensOut);

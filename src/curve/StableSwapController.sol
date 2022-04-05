@@ -37,26 +37,20 @@ contract StableSwapController is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        (uint256[3] memory amounts,) = abi.decode(
-            data[4:],
-            (uint256[3], uint256)
-        );
-        uint count; 
-        
-        for (uint i=0; i<3; i++)
-            if (amounts[i] > 0) count++;
-        
-        address[] memory tokensOut = new address[](count);
-        count = 0;
-        for (uint i; i<3; i++)
-            if (amounts[i] > 0) {
-                tokensOut[count] = IStableSwapPool(target).coins(i);
-                count++;
-            }
-        
         address[] memory tokensIn = new address[](1);
-        tokensIn[0] = IStableSwapPool(target).token();    
-        return (controllerFacade.isSwapAllowed(tokensIn[0]), tokensIn, tokensOut);
+        tokensIn[0] = IStableSwapPool(target).token();
+        
+        uint i; uint j;
+        (uint[3] memory amounts) = abi.decode(data[4:], (uint[3]));
+        address[] memory tokensOut = new address[](3);
+        while(i < 3) {
+            if(amounts[i] > 0)
+                tokensOut[j++] = IStableSwapPool(target).coins(i);
+            unchecked { ++i; }
+        }
+        assembly { mstore(tokensOut, j) }
+
+        return (true, tokensIn, tokensOut);
     }
 
     function canRemoveLiquidityOneCoin(address target, bytes calldata data)
@@ -91,20 +85,18 @@ contract StableSwapController is IController {
             (uint256, uint256[3])
         );
 
-        uint count; 
-        for (uint i=0; i<3; i++)
-            if (amounts[i] > 0) count++;
-        
-        address[] memory tokensIn = new address[](count);
-        count = 0;
-        for (uint i; i<3; i++)
-            if (amounts[i] > 0) {
-                tokensIn[count] = IStableSwapPool(target).coins(i);
-                count++;
-            }
-        
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = IStableSwapPool(target).token();
+
+        uint i; uint j;
+        address[] memory tokensIn = new address[](3);
+        while(i < 3) {
+            if(amounts[i] > 0)
+                tokensIn[j++] = IStableSwapPool(target).coins(i);
+            unchecked { ++i; }
+        }
+        assembly { mstore(tokensIn, j) }
+        
         return (true, tokensIn, tokensOut);
     }
 

@@ -8,6 +8,9 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
 contract StableSwapController is IController {
     IControllerFacade public immutable controllerFacade;
     bytes4 public constant EXCHANGE = 0x3df02124;
+    bytes4 public constant ADD_LIQUIDITY = 0x4515cef3;
+    bytes4 public constant REMOVE_LIQUIDITY = 0xecb586a5;
+    bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0x1a4d01d2;
 
     constructor(IControllerFacade _controllerFacade) {
         controllerFacade = _controllerFacade;
@@ -18,12 +21,90 @@ contract StableSwapController is IController {
         view
         returns (bool, address[] memory, address[] memory)  
     {   
-        // validate signature
-        if (bytes4(data) != EXCHANGE)
+        bytes4 sig = bytes4(data);
+
+        if (sig == ADD_LIQUIDITY) return canAddLiquidity(target, data);
+        if (sig == REMOVE_LIQUIDITY_ONE_COIN) 
+            return canRemoveLiquidityOneCoin(target, data);
+        if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity(target, data);
+        if (sig == EXCHANGE) return canExchange(target, data);
+        
+        return (false, new address[](0), new address[](0));
+    }
+
+    function canAddLiquidity(address target, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        address[] memory tokensIn = new address[](1);
+        tokensIn[0] = IStableSwapPool(target).token();
+        
+        uint i; uint j;
+        (uint[3] memory amounts) = abi.decode(data[4:], (uint[3]));
+        address[] memory tokensOut = new address[](3);
+        while(i < 3) {
+            if(amounts[i] > 0)
+                tokensOut[j++] = IStableSwapPool(target).coins(i);
+            unchecked { ++i; }
+        }
+        assembly { mstore(tokensOut, j) }
+
+        return (true, tokensIn, tokensOut);
+    }
+
+    function canRemoveLiquidityOneCoin(address target, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        (,int128 i, uint256 min_amount) = abi.decode(
+            data[4:],
+            (uint256, int128, uint256)
+        );
+            
+        if (min_amount == 0)
             return (false, new address[](0), new address[](0));
 
-        // decode data
-        // TODO Save gas by directly decoding to uint and avoid casting later
+        address[] memory tokensIn = new address[](1);
+        address[] memory tokensOut = new address[](1);
+        
+        tokensIn[0] = IStableSwapPool(target).coins(uint128(i));
+        tokensOut[0] = IStableSwapPool(target).token();
+
+        return (true, tokensIn, tokensOut);
+    }
+
+    function canRemoveLiquidity(address target, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        (,uint256[3] memory amounts) = abi.decode(
+            data[4:],
+            (uint256, uint256[3])
+        );
+
+        address[] memory tokensOut = new address[](1);
+        tokensOut[0] = IStableSwapPool(target).token();
+
+        uint i; uint j;
+        address[] memory tokensIn = new address[](3);
+        while(i < 3) {
+            if(amounts[i] > 0)
+                tokensIn[j++] = IStableSwapPool(target).coins(i);
+            unchecked { ++i; }
+        }
+        assembly { mstore(tokensIn, j) }
+        
+        return (true, tokensIn, tokensOut);
+    }
+
+    function canExchange(address target, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
         (int128 i, int128 j,,) = abi.decode(
             data[4:],
             (int128, int128, uint256, uint256)

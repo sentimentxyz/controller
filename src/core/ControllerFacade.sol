@@ -6,7 +6,7 @@ import {IController} from "./IController.sol";
 import {IControllerFacade} from "./IControllerFacade.sol";
 
 contract ControllerFacade is Ownable, IControllerFacade {
-    mapping(address => bool) public isSwapAllowed;
+    mapping(address => bool) public isTokenAllowed;
     mapping(address => IController) public controllerFor;
 
     event UpdateController(address indexed target, address indexed controller);
@@ -49,7 +49,7 @@ contract ControllerFacade is Ownable, IControllerFacade {
         emit UpdateController(target, address(controller));
     }
 
-    function toggleSwapAllowance(address token) external adminOnly {
-        isSwapAllowed[token] = !isSwapAllowed[token];
+    function toggleTokenAllowance(address token) external adminOnly {
+        isTokenAllowed[token] = !isTokenAllowed[token];
     }
 }

@@ -37,7 +37,7 @@ contract UniV2Controller is IController {
             tokensOut[0] = path[0];
             
             return(
-                controller.isSwapAllowed(tokensIn[0]), 
+                controller.isTokenAllowed(tokensIn[0]), 
                 tokensIn, 
                 tokensOut
             );
@@ -52,7 +52,7 @@ contract UniV2Controller is IController {
             tokensIn[0] = path[path.length - 1];
 
             return (
-                controller.isSwapAllowed(tokensIn[0]), 
+                controller.isTokenAllowed(tokensIn[0]), 
                 tokensIn, 
                 new address[](0)
             );

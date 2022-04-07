@@ -2,7 +2,7 @@
 pragma solidity ^0.8.10;
 
 interface IControllerFacade {
-    function isSwapAllowed(address token) external view returns (bool);
+    function isTokenAllowed(address token) external view returns (bool);
     
     function canCall(
         address target,

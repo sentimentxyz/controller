@@ -31,7 +31,7 @@ contract AaveV3Controller is IController {
             tokensIn[0] = IPoolV3(target).getReserveData(asset).aTokenAddress;
             tokensOut[0] = asset;
             return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
+                controllerFacade.isTokenAllowed(tokensIn[0]),
                 tokensIn,
                 tokensOut
             );

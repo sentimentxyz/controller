@@ -116,7 +116,7 @@ contract StableSwapController is IController {
         tokensOut[0] = IStableSwapPool(target).coins(uint128(i));
         
         return (
-            controllerFacade.isSwapAllowed(tokensIn[0]), 
+            controllerFacade.isTokenAllowed(tokensIn[0]), 
             tokensIn, 
             tokensOut
         );

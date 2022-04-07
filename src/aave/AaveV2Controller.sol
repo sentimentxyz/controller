@@ -37,7 +37,7 @@ contract AaveV2Controller is IController {
             (tokensIn[0],,) = dataProvider.getReserveTokensAddresses(asset);
             tokensOut[0] = asset;
             return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
+                controllerFacade.isTokenAllowed(tokensIn[0]),
                 tokensIn,
                 tokensOut
             );

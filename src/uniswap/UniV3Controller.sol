@@ -79,7 +79,7 @@ contract UniV3Controller is IController {
         tokensOut[0] = params.tokenIn;
         
         return (
-            controllerFacade.isSwapAllowed(tokensIn[0]),
+            controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
             tokensOut
         );
@@ -102,7 +102,7 @@ contract UniV3Controller is IController {
         // If swapping ETH <-> ERC20
         if (useEth) {
             return (
-                controllerFacade.isSwapAllowed(tokensIn[0]), 
+                controllerFacade.isTokenAllowed(tokensIn[0]), 
                 tokensIn, 
                 new address[](0)
             );
@@ -112,7 +112,7 @@ contract UniV3Controller is IController {
         tokensOut[0] = params.tokenIn;
         
         return (
-            controllerFacade.isSwapAllowed(tokensIn[0]),
+            controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
             tokensOut
         );   
@@ -137,7 +137,7 @@ contract UniV3Controller is IController {
             address[] memory tokensIn = new address[](1);
             tokensIn[0] = params.tokenOut;
             return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
+                controllerFacade.isTokenAllowed(tokensIn[0]),
                 tokensIn,
                 new address[](0)
             );

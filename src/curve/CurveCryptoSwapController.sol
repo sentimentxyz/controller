@@ -115,7 +115,7 @@ contract CurveCryptoSwapController is IController {
             
         if (useEth) 
             return (
-                controllerFacade.isSwapAllowed(tokensIn[0]),
+                controllerFacade.isTokenAllowed(tokensIn[0]),
                 tokensIn,
                 new address[](0)
             );
@@ -124,7 +124,7 @@ contract CurveCryptoSwapController is IController {
         tokensOut[0] = IStableSwapPool(target).coins(i);
             
         return (
-            controllerFacade.isSwapAllowed(tokensIn[0]), 
+            controllerFacade.isTokenAllowed(tokensIn[0]), 
             tokensIn, 
             tokensOut
         );

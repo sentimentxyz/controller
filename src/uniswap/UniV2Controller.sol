@@ -165,8 +165,8 @@ contract UniV2Controller is IController {
         pure
         returns (bool, address[] memory, address[] memory)
     {
-        (, address[] memory path,,) 
-                = abi.decode(data, (uint, address[], address, uint));
+        (,, address[] memory path)
+                = abi.decode(data, (uint, uint, address[]));
         
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = path[0];

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-library AaveDataTypes {
+interface IPoolV3 {
     struct ReserveConfigurationMap {
         uint256 data;
     }
+    
     struct ReserveData {
         ReserveConfigurationMap configuration;
         uint128 liquidityIndex;
@@ -22,11 +23,9 @@ library AaveDataTypes {
         uint128 unbacked;
         uint128 isolationModeTotalDebt;
     }
-}
 
-interface IPoolV3 {
     function getReserveData(address asset) 
         external 
         view 
-        returns (AaveDataTypes.ReserveData memory);
+        returns (ReserveData memory);
 }

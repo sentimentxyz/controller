@@ -3,7 +3,7 @@ pragma solidity ^0.8.10;
 
 interface IUniV2Factory {
     function getPair(address tokenA, address tokenB)
-    external 
-    view 
+    external
+    view
     returns (address pair);
 }

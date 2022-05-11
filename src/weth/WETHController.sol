@@ -7,7 +7,7 @@ contract WETHController is IController {
     bytes4 constant DEPOSIT = 0xd0e30db0;
     bytes4 constant WITHDRAW = 0x2e1a7d4d;
     address[] public weth; // WETH9
-    
+
     constructor(address wEth) {
         weth.push(wEth);
     }

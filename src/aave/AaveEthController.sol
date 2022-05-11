@@ -17,7 +17,7 @@ contract AaveEthController is IController {
         external
         view
         returns (bool, address[] memory, address[] memory)
-    { 
+    {
         bytes4 sig = bytes4(data);
         if (sig == DEPOSIT) return (true, tokens, new address[](0));
         if (sig == WITHDRAW) return (true, new address[](0), tokens);

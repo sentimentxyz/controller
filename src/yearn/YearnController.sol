@@ -12,7 +12,7 @@ contract YearnVaultController is IController {
     bytes4 constant WITHDRAW = 0x2e1a7d4d;
 
     function canCall(address target, bool, bytes calldata data)
-        external 
+        external
         view
         returns (bool, address[] memory, address[] memory)
     {

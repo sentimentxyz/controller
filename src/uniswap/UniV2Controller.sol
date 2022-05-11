@@ -22,7 +22,7 @@ contract UniV2Controller is IController {
 
     // Constants
     address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    IUniV2Factory constant UNIV2_FACTORY = 
+    IUniV2Factory constant UNIV2_FACTORY =
         IUniV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
 
     IControllerFacade public immutable controller;
@@ -31,7 +31,7 @@ contract UniV2Controller is IController {
         controller = _controller;
     }
 
-    function canCall(address, bool, bytes calldata data) 
+    function canCall(address, bool, bytes calldata data)
         external
         view
         returns (bool, address[] memory, address[] memory)
@@ -45,7 +45,7 @@ contract UniV2Controller is IController {
             return swapEthForErc20(data[4:]); // ETH -> ERC20
         if (sig == SWAP_TOKENS_FOR_EXACT_ETH || sig == SWAP_EXACT_TOKENS_FOR_ETH)
             return swapErc20ForEth(data[4:]); // ERC20 -> ETH
-        
+
         // LP Functions
         if (sig == ADD_LIQUIDITY) return addLiquidity(data[4:]);
         if (sig == REMOVE_LIQUIDITY) return removeLiquidity(data[4:]);
@@ -78,7 +78,7 @@ contract UniV2Controller is IController {
         returns (bool, address[] memory, address[] memory)
     {
         address token = abi.decode(data, (address));
-        
+
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = token;
 
@@ -126,18 +126,18 @@ contract UniV2Controller is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        (,, address[] memory path,,) 
+        (,, address[] memory path,,)
                 = abi.decode(data, (uint, uint, address[], address, uint));
-        
+
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = path[0];
 
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = path[path.length - 1];
-            
+
         return(
-            controller.isTokenAllowed(tokensIn[0]), 
-            tokensIn, 
+            controller.isTokenAllowed(tokensIn[0]),
+            tokensIn,
             tokensOut
         );
     }
@@ -147,15 +147,15 @@ contract UniV2Controller is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        (, address[] memory path,,) 
+        (, address[] memory path,,)
                 = abi.decode(data, (uint, address[], address, uint));
 
-        address[] memory tokensIn = new address[](1);       
+        address[] memory tokensIn = new address[](1);
         tokensIn[0] = path[path.length - 1];
 
         return (
-            controller.isTokenAllowed(tokensIn[0]), 
-            tokensIn, 
+            controller.isTokenAllowed(tokensIn[0]),
+            tokensIn,
             new address[](0)
         );
     }
@@ -167,10 +167,10 @@ contract UniV2Controller is IController {
     {
         (,, address[] memory path)
                 = abi.decode(data, (uint, uint, address[]));
-        
+
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = path[0];
-            
+
         return (true, new address[](0), tokensOut);
     }
 }

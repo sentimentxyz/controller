@@ -16,19 +16,19 @@ contract StableSwapController is IController {
         controllerFacade = _controllerFacade;
     }
 
-    function canCall(address target, bool, bytes calldata data) 
+    function canCall(address target, bool, bytes calldata data)
         external
         view
-        returns (bool, address[] memory, address[] memory)  
-    {   
+        returns (bool, address[] memory, address[] memory)
+    {
         bytes4 sig = bytes4(data);
 
         if (sig == ADD_LIQUIDITY) return canAddLiquidity(target, data);
-        if (sig == REMOVE_LIQUIDITY_ONE_COIN) 
+        if (sig == REMOVE_LIQUIDITY_ONE_COIN)
             return canRemoveLiquidityOneCoin(target, data);
         if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity(target, data);
         if (sig == EXCHANGE) return canExchange(target, data);
-        
+
         return (false, new address[](0), new address[](0));
     }
 
@@ -39,7 +39,7 @@ contract StableSwapController is IController {
     {
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = IStableSwapPool(target).token();
-        
+
         uint i; uint j;
         (uint[3] memory amounts) = abi.decode(data[4:], (uint[3]));
         address[] memory tokensOut = new address[](3);
@@ -62,13 +62,13 @@ contract StableSwapController is IController {
             data[4:],
             (uint256, int128, uint256)
         );
-            
+
         if (min_amount == 0)
             return (false, new address[](0), new address[](0));
 
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
-        
+
         tokensIn[0] = IStableSwapPool(target).coins(uint128(i));
         tokensOut[0] = IStableSwapPool(target).token();
 
@@ -96,7 +96,7 @@ contract StableSwapController is IController {
             unchecked { ++i; }
         }
         assembly { mstore(tokensIn, j) }
-        
+
         return (true, tokensIn, tokensOut);
     }
 
@@ -112,12 +112,12 @@ contract StableSwapController is IController {
 
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
-        tokensIn[0] = IStableSwapPool(target).coins(uint128(j));     
+        tokensIn[0] = IStableSwapPool(target).coins(uint128(j));
         tokensOut[0] = IStableSwapPool(target).coins(uint128(i));
-        
+
         return (
-            controllerFacade.isTokenAllowed(tokensIn[0]), 
-            tokensIn, 
+            controllerFacade.isTokenAllowed(tokensIn[0]),
+            tokensIn,
             tokensOut
         );
     }

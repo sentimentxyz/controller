@@ -10,7 +10,7 @@ contract ControllerFacade is Ownable, IControllerFacade {
     mapping(address => IController) public controllerFor;
 
     event UpdateController(address indexed target, address indexed controller);
-    
+
     constructor() Ownable(msg.sender) {}
 
     function canCall(
@@ -42,8 +42,8 @@ contract ControllerFacade is Ownable, IControllerFacade {
 
     // Admin Only
     function updateController(address target, IController controller)
-        external 
-        adminOnly 
+        external
+        adminOnly
     {
         controllerFor[target] = controller;
         emit UpdateController(target, address(controller));

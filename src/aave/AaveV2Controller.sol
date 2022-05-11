@@ -15,7 +15,7 @@ contract AaveV2Controller is IController {
     constructor(
         IControllerFacade _controller,
         IProtocolDataProvider _dataProvider
-    ) 
+    )
     {
         controllerFacade = _controller;
         dataProvider = _dataProvider;
@@ -25,7 +25,7 @@ contract AaveV2Controller is IController {
         external
         view
         returns (bool, address[] memory, address[] memory)
-    { 
+    {
         bytes4 sig = bytes4(data);
         if (sig == DEPOSIT) {
             address asset = abi.decode(

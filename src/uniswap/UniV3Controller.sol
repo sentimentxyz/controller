@@ -8,7 +8,7 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
 
 contract UniV3Controller is IController {
     using BytesLib for bytes;
-    
+
     bytes4 constant MULTICALL = 0xac9650d8;
     bytes4 constant REFUUND_ETH = 0x12210e8a;
     bytes4 constant UNWRAP_ETH = 0x49404b7c;
@@ -29,15 +29,15 @@ contract UniV3Controller is IController {
         bytes4 sig = bytes4(data); // Slice function selector
 
         if (sig == MULTICALL) return parseMultiCall(data[4:], useEth);
-        if (sig == EXACT_OUTPUT_SINGLE) 
+        if (sig == EXACT_OUTPUT_SINGLE)
             return parseExactOutputSingle(data[4:]);
-        if (sig == EXACT_INPUT_SINGLE) 
+        if (sig == EXACT_INPUT_SINGLE)
             return parseExactInputSingle(data[4:], useEth);
         return (false, new address[](0), new address[](0));
     }
 
-    function parseMultiCall(bytes calldata data, bool useEth) 
-        internal 
+    function parseMultiCall(bytes calldata data, bool useEth)
+        internal
         view
         returns (bool, address[] memory, address[] memory)
     {
@@ -45,11 +45,11 @@ contract UniV3Controller is IController {
         bytes[] memory calls = abi.decode(data, (bytes[]));
 
         // Multicalls with > 2 calls are treated as malformed data
-        if (calls.length > 2) 
+        if (calls.length > 2)
             return (false, new address[](0), new address[](0));
-        
+
         bytes4 sig = bytes4(calls[0]);
-         
+
         // Handle case when first function call is exactOutputSingle
         if (sig == EXACT_OUTPUT_SINGLE)
             return parseExactOutputSingleMulticall(calls, useEth);
@@ -57,11 +57,11 @@ contract UniV3Controller is IController {
         // Handle case when first function call is exactInputSingle
         if (sig == EXACT_INPUT_SINGLE)
             return parseExactInputSingleMulticall(calls);
-        
+
         return (false, new address[](0), new address[](0));
     }
 
-    function parseExactOutputSingle(bytes calldata data) 
+    function parseExactOutputSingle(bytes calldata data)
         internal
         view
         returns (bool, address[] memory, address[] memory)
@@ -71,13 +71,13 @@ contract UniV3Controller is IController {
             data,
             (ISwapRouterV3.ExactOutputSingleParams)
         );
-        
+
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
-        
+
         tokensIn[0] = params.tokenOut;
         tokensOut[0] = params.tokenIn;
-        
+
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
@@ -95,43 +95,43 @@ contract UniV3Controller is IController {
             data,
             (ISwapRouterV3.ExactInputSingleParams)
         );
-        
+
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = params.tokenOut;
-        
+
         // If swapping ETH <-> ERC20
         if (useEth) {
             return (
-                controllerFacade.isTokenAllowed(tokensIn[0]), 
-                tokensIn, 
+                controllerFacade.isTokenAllowed(tokensIn[0]),
+                tokensIn,
                 new address[](0)
             );
         }
-        
+
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = params.tokenIn;
-        
+
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
             tokensOut
-        );   
+        );
     }
 
     function parseExactOutputSingleMulticall(
         bytes[] memory multiData,
         bool useEth
     )
-        internal 
-        view 
-        returns (bool, address[] memory, address[] memory) 
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
     {
         // remove sig from data and decode params
         ISwapRouterV3.ExactOutputSingleParams memory params = abi.decode(
             multiData[0].slice(4, multiData[0].length - 4),
             (ISwapRouterV3.ExactOutputSingleParams)
         );
-        
+
         // Swapping Eth <-> ERC20
         if (useEth && bytes4(multiData[1]) == REFUUND_ETH) {
             address[] memory tokensIn = new address[](1);
@@ -143,7 +143,7 @@ contract UniV3Controller is IController {
             );
         }
 
-        // Swapping ERC20 <-> ETH   
+        // Swapping ERC20 <-> ETH
         if (bytes4(multiData[1]) == UNWRAP_ETH) {
             address[] memory tokensOut = new address[](1);
             tokensOut[0] = params.tokenIn;
@@ -155,18 +155,18 @@ contract UniV3Controller is IController {
 
     function parseExactInputSingleMulticall(
         bytes[] memory multiData
-    ) 
-        internal 
+    )
+        internal
         pure
-        returns (bool, address[] memory, address[] memory) 
-    {   
+        returns (bool, address[] memory, address[] memory)
+    {
         // Swap ERC20 <-> ETH
         if (bytes4(multiData[1]) == UNWRAP_ETH) {
             ISwapRouterV3.ExactInputSingleParams memory params = abi.decode(
                 multiData[0].slice(4, multiData[0].length - 4),
                 (ISwapRouterV3.ExactInputSingleParams)
             );
-            
+
             address[] memory tokensOut = new address[](1);
             tokensOut[0] = params.tokenIn;
             return (true, new address[](0), tokensOut);

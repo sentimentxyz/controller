@@ -5,7 +5,7 @@ interface IPoolV3 {
     struct ReserveConfigurationMap {
         uint256 data;
     }
-    
+
     struct ReserveData {
         ReserveConfigurationMap configuration;
         uint128 liquidityIndex;
@@ -24,8 +24,8 @@ interface IPoolV3 {
         uint128 isolationModeTotalDebt;
     }
 
-    function getReserveData(address asset) 
-        external 
-        view 
+    function getReserveData(address asset)
+        external
+        view
         returns (ReserveData memory);
 }

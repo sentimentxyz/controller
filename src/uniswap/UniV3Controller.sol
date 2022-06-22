@@ -16,8 +16,8 @@ contract UniV3Controller is IController {
     bytes4 constant UNWRAP_ETH = 0x49404b7c;
     bytes4 constant EXACT_INPUT_SINGLE = 0x04e45aaf;
     bytes4 constant EXACT_OUTPUT_SINGLE = 0x5023b4df;
-    bytes4 constant EXACT_INPUT = 0x04e45aaf;
-    bytes4 constant EXACT_OUTPUT = 0x04e45aaf;
+    bytes4 constant EXACT_INPUT = 0xc04b8d59;
+    bytes4 constant EXACT_OUTPUT = 0xf28c0498;
 
     IControllerFacade public immutable controllerFacade;
 

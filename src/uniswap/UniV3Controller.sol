@@ -9,11 +9,15 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
 contract UniV3Controller is IController {
     using BytesLib for bytes;
 
+    uint256 private constant ADDR_SIZE = 20;
+
     bytes4 constant MULTICALL = 0xac9650d8;
     bytes4 constant REFUUND_ETH = 0x12210e8a;
     bytes4 constant UNWRAP_ETH = 0x49404b7c;
     bytes4 constant EXACT_INPUT_SINGLE = 0x04e45aaf;
     bytes4 constant EXACT_OUTPUT_SINGLE = 0x5023b4df;
+    bytes4 constant EXACT_INPUT = 0x04e45aaf;
+    bytes4 constant EXACT_OUTPUT = 0x04e45aaf;
 
     IControllerFacade public immutable controllerFacade;
 
@@ -33,6 +37,10 @@ contract UniV3Controller is IController {
             return parseExactOutputSingle(data[4:]);
         if (sig == EXACT_INPUT_SINGLE)
             return parseExactInputSingle(data[4:], useEth);
+        if (sig == EXACT_OUTPUT)
+            return parseExactOutput(data[4:]);
+        if (sig == EXACT_INPUT)
+            return parseExactInput(data[4:], useEth);
         return (false, new address[](0), new address[](0));
     }
 
@@ -58,6 +66,12 @@ contract UniV3Controller is IController {
         if (sig == EXACT_INPUT_SINGLE)
             return parseExactInputSingleMulticall(calls);
 
+        if (sig == EXACT_INPUT)
+            return parseExactInputMulticall(calls);
+
+        if (sig == EXACT_OUTPUT)
+            return parseExactOutputMulticall(calls, useEth);
+
         return (false, new address[](0), new address[](0));
     }
 
@@ -77,6 +91,30 @@ contract UniV3Controller is IController {
 
         tokensIn[0] = params.tokenOut;
         tokensOut[0] = params.tokenIn;
+
+        return (
+            controllerFacade.isTokenAllowed(tokensIn[0]),
+            tokensIn,
+            tokensOut
+        );
+    }
+
+    function parseExactOutput(bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Decode Params
+        ISwapRouterV3.ExactOutputParams memory params = abi.decode(
+            data,
+            (ISwapRouterV3.ExactOutputParams)
+        );
+
+        address[] memory tokensIn = new address[](1);
+        address[] memory tokensOut = new address[](1);
+
+        tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
+        tokensOut[0] = params.path.toAddress(0);
 
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
@@ -110,6 +148,39 @@ contract UniV3Controller is IController {
 
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = params.tokenIn;
+
+        return (
+            controllerFacade.isTokenAllowed(tokensIn[0]),
+            tokensIn,
+            tokensOut
+        );
+    }
+
+    function parseExactInput(bytes calldata data, bool useEth)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Decode swap params
+        ISwapRouterV3.ExactInputParams memory params = abi.decode(
+            data,
+            (ISwapRouterV3.ExactInputParams)
+        );
+
+        address[] memory tokensIn = new address[](1);
+        tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
+
+        // If swapping ETH <-> ERC20
+        if (useEth) {
+            return (
+                controllerFacade.isTokenAllowed(tokensIn[0]),
+                tokensIn,
+                new address[](0)
+            );
+        }
+
+        address[] memory tokensOut = new address[](1);
+        tokensOut[0] = params.path.toAddress(0);
 
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
@@ -153,6 +224,41 @@ contract UniV3Controller is IController {
         return (false, new address[](0), new address[](0));
     }
 
+    function parseExactOutputMulticall(
+        bytes[] memory multiData,
+        bool useEth
+    )
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        // remove sig from data and decode params
+        ISwapRouterV3.ExactOutputParams memory params = abi.decode(
+            multiData[0].slice(4, multiData[0].length - 4),
+            (ISwapRouterV3.ExactOutputParams)
+        );
+
+        // Swapping Eth <-> ERC20
+        if (useEth && bytes4(multiData[1]) == REFUUND_ETH) {
+            address[] memory tokensIn = new address[](1);
+            tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
+            return (
+                controllerFacade.isTokenAllowed(tokensIn[0]),
+                tokensIn,
+                new address[](0)
+            );
+        }
+
+        // Swapping ERC20 <-> ETH
+        if (bytes4(multiData[1]) == UNWRAP_ETH) {
+            address[] memory tokensOut = new address[](1);
+            tokensOut[0] = params.path.toAddress(0);
+            return (true, new address[](0), tokensOut);
+        }
+
+        return (false, new address[](0), new address[](0));
+    }
+
     function parseExactInputSingleMulticall(
         bytes[] memory multiData
     )
@@ -169,6 +275,27 @@ contract UniV3Controller is IController {
 
             address[] memory tokensOut = new address[](1);
             tokensOut[0] = params.tokenIn;
+            return (true, new address[](0), tokensOut);
+        }
+        return (false, new address[](0), new address[](0));
+    }
+
+    function parseExactInputMulticall(
+        bytes[] memory multiData
+    )
+        internal
+        pure
+        returns (bool, address[] memory, address[] memory)
+    {
+        // Swap ERC20 <-> ETH
+        if (bytes4(multiData[1]) == UNWRAP_ETH) {
+            ISwapRouterV3.ExactInputParams memory params = abi.decode(
+                multiData[0].slice(4, multiData[0].length - 4),
+                (ISwapRouterV3.ExactInputParams)
+            );
+
+            address[] memory tokensOut = new address[](1);
+            tokensOut[0] = params.path.toAddress(0);
             return (true, new address[](0), tokensOut);
         }
         return (false, new address[](0), new address[](0));

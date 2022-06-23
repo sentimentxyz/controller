@@ -12,7 +12,7 @@ contract UniV3Controller is IController {
     uint256 private constant ADDR_SIZE = 20;
 
     bytes4 constant MULTICALL = 0xac9650d8;
-    bytes4 constant REFUUND_ETH = 0x12210e8a;
+    bytes4 constant REFUND_ETH = 0x12210e8a;
     bytes4 constant UNWRAP_ETH = 0x49404b7c;
     bytes4 constant EXACT_INPUT_SINGLE = 0x04e45aaf;
     bytes4 constant EXACT_OUTPUT_SINGLE = 0x5023b4df;
@@ -204,7 +204,7 @@ contract UniV3Controller is IController {
         );
 
         // Swapping Eth <-> ERC20
-        if (useEth && bytes4(multiData[1]) == REFUUND_ETH) {
+        if (useEth && bytes4(multiData[1]) == REFUND_ETH) {
             address[] memory tokensIn = new address[](1);
             tokensIn[0] = params.tokenOut;
             return (
@@ -239,7 +239,7 @@ contract UniV3Controller is IController {
         );
 
         // Swapping Eth <-> ERC20
-        if (useEth && bytes4(multiData[1]) == REFUUND_ETH) {
+        if (useEth && bytes4(multiData[1]) == REFUND_ETH) {
             address[] memory tokensIn = new address[](1);
             tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
             return (

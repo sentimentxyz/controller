@@ -9,6 +9,7 @@ contract CompoundController is IController {
     bytes4 constant MINT_ERC20 = 0xa0712d68;
     bytes4 constant REDEEM = 0xdb006a75;
 
+    // keccak256(abi.encodePacked("cETH"))
     bytes32 constant ethSymbol =
         0xb3c46c78043b5ff6963757142af6c297cddb5a0d3d823357472228eb35c8e890;
 

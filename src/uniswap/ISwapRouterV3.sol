@@ -21,4 +21,20 @@ interface ISwapRouterV3 {
         uint256 amountOutMinimum;
         uint160 sqrtPriceLimitX96;
     }
+
+    struct ExactInputParams {
+        bytes path;
+        address recipient;
+        uint256 deadline;
+        uint256 amountIn;
+        uint256 amountOutMinimum;
+    }
+
+    struct ExactOutputParams {
+        bytes path;
+        address recipient;
+        uint256 deadline;
+        uint256 amountOut;
+        uint256 amountInMaximum;
+    }
 }

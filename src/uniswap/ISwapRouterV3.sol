@@ -25,7 +25,6 @@ interface ISwapRouterV3 {
     struct ExactInputParams {
         bytes path;
         address recipient;
-        uint256 deadline;
         uint256 amountIn;
         uint256 amountOutMinimum;
     }
@@ -33,7 +32,6 @@ interface ISwapRouterV3 {
     struct ExactOutputParams {
         bytes path;
         address recipient;
-        uint256 deadline;
         uint256 amountOut;
         uint256 amountInMaximum;
     }

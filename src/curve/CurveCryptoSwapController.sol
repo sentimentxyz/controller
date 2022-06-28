@@ -1,21 +1,56 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IStableSwapPool} from "./IStableSwapPool.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 
+/**
+    @title Curve Crypto Swap Controller
+    @notice Controller for curve crypto swap interaction
+*/
 contract CurveCryptoSwapController is IController {
+
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice IControllerFacade
     IControllerFacade public immutable controllerFacade;
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice exchange(uint256,uint256,uint256,uint256,bool) function signature
     bytes4 public constant EXCHANGE = 0x394747c5;
+
+    /// @notice add_liquidity(uint256[3],uint256) function signature
     bytes4 public constant ADD_LIQUIDITY = 0x4515cef3;
+
+    /// @notice remove_liquidity(uint256,uint256[3]) function signature
     bytes4 public constant REMOVE_LIQUIDITY = 0xecb586a5;
+
+    /// @notice remove_liquidity_one_coin(uint256,uint256,uint256) function signature
     bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0xf1dc3cc9;
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _controllerFacade Address of controller facade
+    */
     constructor(IControllerFacade _controllerFacade) {
         controllerFacade = _controllerFacade;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address target, bool useEth, bytes calldata data)
         external
         view
@@ -32,6 +67,20 @@ contract CurveCryptoSwapController is IController {
         return (false, new address[](0), new address[](0));
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Evaluates whether protocol can add liquidity to the target contract
+        @param target External protocol address
+        @param data calldata of the interaction with the target address
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that the account will send to the
+        target
+    */
     function canAddLiquidity(address target, bytes calldata data)
         internal
         view
@@ -53,6 +102,16 @@ contract CurveCryptoSwapController is IController {
         return (true, tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether protocol can remove liquidity from the target contract
+        @param target External protocol address
+        @param data calldata of the interaction with the target address
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that the account will send to the
+        target
+    */
     function canRemoveLiquidityOneCoin(address target, bytes calldata data)
         internal
         view
@@ -75,6 +134,16 @@ contract CurveCryptoSwapController is IController {
         return (true, tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether protocol can remove liquidity from the target contract
+        @param target External protocol address
+        @param data calldata of the interaction with the target address
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that the account will send to the
+        target
+    */
     function canRemoveLiquidity(address target, bytes calldata data)
         internal
         view
@@ -100,6 +169,16 @@ contract CurveCryptoSwapController is IController {
         return (true, tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether protocol can perform a swap using the target contract
+        @param target External protocol address
+        @param data calldata of the interaction with the target address
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that the account will send to the
+        target
+    */
     function canExchange(address target, bool useEth, bytes calldata data)
         internal
         view

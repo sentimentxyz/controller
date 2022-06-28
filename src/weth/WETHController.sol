@@ -1,17 +1,49 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 
+/**
+    @title WETH Controller
+    @notice Controller for Interacting with Wrapped Ether contract
+*/
 contract WETHController is IController {
-    bytes4 constant DEPOSIT = 0xd0e30db0;
-    bytes4 constant WITHDRAW = 0x2e1a7d4d;
-    address[] public weth; // WETH9
 
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice deposit() function signature
+    bytes4 constant DEPOSIT = 0xd0e30db0;
+
+    /// @notice withdraw(uint256) function signature
+    bytes4 constant WITHDRAW = 0x2e1a7d4d;
+
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice List of tokens
+    /// @dev Will always have one token WETH
+    address[] public weth;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param wEth address of WETH
+    */
     constructor(address wEth) {
         weth.push(wEth);
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(
         address,
         bool,

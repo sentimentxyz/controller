@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.15;
 
 interface IProtocolDataProvider {
-    function getReserveTokensAddresses(address asset) 
+    function getReserveTokensAddresses(address asset)
         external
         view
         returns (

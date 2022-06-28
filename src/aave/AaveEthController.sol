@@ -1,18 +1,49 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 
+/**
+    @title Aave Eth Controller
+    @notice Controller for aave Weth interaction
+*/
 contract AaveEthController is IController {
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice depositETH(address,address,uint16) function signature
     bytes4 public constant DEPOSIT = 0x474cf53d;
+
+    /// @notice withdrawETH(address,uint256,address) function signature
     bytes4 public constant WITHDRAW = 0x80500d20;
 
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice List of tokens
+    /// @dev Will always have one token aave WETH
     address[] public tokens;
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _aWeth address of aave WETH
+    */
     constructor(address _aWeth) {
         tokens.push(_aWeth);
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address, bool, bytes calldata data)
         external
         view

@@ -1,17 +1,48 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IProtocolDataProvider} from "./IProtocolDataProvider.sol";
 
+/**
+    @title Aave V2 controller
+    @notice Controller for aave v2 interaction
+*/
 contract AaveV2Controller is IController {
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice deposit(address,uint256,address,uint16)	function signature
     bytes4 public constant DEPOSIT = 0xe8eda9df;
+
+    /// @notice withdraw(address,uint256,address) function signature
     bytes4 public constant WITHDRAW = 0x69328dec;
 
-    IProtocolDataProvider public dataProvider;
-    IControllerFacade public controllerFacade;
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE_VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
 
+    /**
+        @notice IProtocolDataProvider
+        @dev https://docs.aave.com/developers/v/2.0/the-core-protocol/protocol-data-provider/iprotocoldataprovider
+    */
+    IProtocolDataProvider public immutable dataProvider;
+
+    /// @notice IControllerFacade
+    IControllerFacade public immutable controllerFacade;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _controller address of controller Facade
+        @param _dataProvider address of aave v2 data provider
+    */
     constructor(
         IControllerFacade _controller,
         IProtocolDataProvider _dataProvider
@@ -21,6 +52,11 @@ contract AaveV2Controller is IController {
         dataProvider = _dataProvider;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address, bool, bytes calldata data)
         external
         view

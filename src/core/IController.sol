@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.15;
 
 interface IController {
 
@@ -12,8 +12,8 @@ interface IController {
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
-        @return tokensOut List of tokens that the account will send to the
-        target
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
     */
     function canCall(
         address target,

@@ -78,8 +78,8 @@ contract CurveCryptoSwapController is IController {
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
-        @return tokensOut List of tokens that the account will send to the
-        target
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
     */
     function canAddLiquidity(address target, bytes calldata data)
         internal
@@ -109,8 +109,8 @@ contract CurveCryptoSwapController is IController {
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
-        @return tokensOut List of tokens that the account will send to the
-        target
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
     */
     function canRemoveLiquidityOneCoin(address target, bytes calldata data)
         internal
@@ -141,8 +141,8 @@ contract CurveCryptoSwapController is IController {
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
-        @return tokensOut List of tokens that the account will send to the
-        target
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
     */
     function canRemoveLiquidity(address target, bytes calldata data)
         internal
@@ -176,8 +176,8 @@ contract CurveCryptoSwapController is IController {
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
-        @return tokensOut List of tokens that the account will send to the
-        target
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
     */
     function canExchange(address target, bool useEth, bytes calldata data)
         internal

@@ -1,30 +1,70 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.15;
 
 import {ISwapRouterV3} from "./ISwapRouterV3.sol";
 import {IController} from "../core/IController.sol";
 import {BytesLib} from "solidity-bytes-utils/BytesLib.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 
+/**
+    @title Uniswap V3 Controller
+    @notice Controller for uniswap v3 interaction
+*/
 contract UniV3Controller is IController {
     using BytesLib for bytes;
 
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice size of address stored in bytes
     uint256 private constant ADDR_SIZE = 20;
 
+    /// @notice multicall(bytes[]) function signature
     bytes4 constant MULTICALL = 0xac9650d8;
+
+    /// @notice refundETH()	function signature
     bytes4 constant REFUND_ETH = 0x12210e8a;
+
+    /// @notice unwrapWETH9(uint256,address) function signature
     bytes4 constant UNWRAP_ETH = 0x49404b7c;
+
+    /// @notice exactInputSingle((address,address,uint24,address,uint256,uint256,uint160)) function signature
     bytes4 constant EXACT_INPUT_SINGLE = 0x04e45aaf;
+
+    /// @notice exactOutputSingle((address,address,uint24,address,uint256,uint256,uint160))	function signature
     bytes4 constant EXACT_OUTPUT_SINGLE = 0x5023b4df;
+
+    /// @notice exactInput((bytes,address,uint256,uint256)) function signature
     bytes4 constant EXACT_INPUT = 0xb858183f;
+
+    /// @notice exactOutput((bytes,address,uint256,uint256)) function signature
     bytes4 constant EXACT_OUTPUT = 0x09b81346;
 
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE_VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice IControllerFacade
     IControllerFacade public immutable controllerFacade;
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _controllerFacade Controller Facade
+    */
     constructor(IControllerFacade _controllerFacade) {
         controllerFacade = _controllerFacade;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address, bool useEth, bytes calldata data)
         external
         view
@@ -44,6 +84,19 @@ contract UniV3Controller is IController {
         return (false, new address[](0), new address[](0));
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Evaluates whether Multi Call can be performed
+        @param data calldata for performing multi call
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function parseMultiCall(bytes calldata data, bool useEth)
         internal
         view
@@ -66,9 +119,11 @@ contract UniV3Controller is IController {
         if (sig == EXACT_INPUT_SINGLE)
             return parseExactInputSingleMulticall(calls);
 
+        // Handle case when first function call is exactInput
         if (sig == EXACT_INPUT)
             return parseExactInputMulticall(calls);
 
+        // Handle case when first function call is exactOutput
         if (sig == EXACT_OUTPUT)
             return parseExactOutputMulticall(calls, useEth);
 

@@ -1,36 +1,88 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IUniV2Factory} from "./IUniV2Factory.sol";
 
+/**
+    @title Uniswap V2 Controller
+    @notice Controller for uniswap v2 interaction
+*/
 contract UniV2Controller is IController {
-    // Swap Functions
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice swapExactTokensForTokens(uint256,uint256,address[],address,uint256)	function signature
     bytes4 constant SWAP_EXACT_TOKENS_FOR_TOKENS = 0x38ed1739;
+
+    /// @notice swapTokensForExactTokens(uint256,uint256,address[],address,uint256)	function signature
     bytes4 constant SWAP_TOKENS_FOR_EXACT_TOKENS = 0x8803dbee;
+
+    /// @notice swapExactETHForTokens(uint256,address[],address,uint256) function signature
     bytes4 constant SWAP_EXACT_ETH_FOR_TOKENS = 0x7ff36ab5;
+
+    /// @notice swapTokensForExactETH(uint256,uint256,address[],address,uint256) function signature
     bytes4 constant SWAP_TOKENS_FOR_EXACT_ETH = 0x4a25d94a;
+
+    /// @notice swapExactTokensForETH(uint256,uint256,address[],address,uint256) function signature
     bytes4 constant SWAP_EXACT_TOKENS_FOR_ETH = 0x18cbafe5;
+
+    /// @notice swapETHForExactTokens(uint256,address[],address,uint256) function signature
     bytes4 constant SWAP_ETH_FOR_EXACT_TOKENS = 0xfb3bdb41;
 
-    // LP Functions
+    /// @notice addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) function signature
     bytes4 constant ADD_LIQUIDITY = 0xe8e33700;
+
+    /// @notice removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) function signature
     bytes4 constant REMOVE_LIQUIDITY = 0xbaa2abde;
+
+    /// @notice addLiquidityETH(address,uint256,uint256,uint256,address,uint256) function signature
     bytes4 constant ADD_LIQUIDITY_ETH = 0xf305d719;
+
+    /// @notice removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) function signature
     bytes4 constant REMOVE_LIQUIDITY_ETH = 0x02751cec;
 
-    // Constants
-    address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    IUniV2Factory constant UNIV2_FACTORY =
-        IUniV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
 
+    /// @notice WETH address
+    address public immutable WETH;
+
+    /// @notice Uniswap v2 factory
+    IUniV2Factory public immutable UNIV2_FACTORY;
+
+    /// @notice IControllerFacade
     IControllerFacade public immutable controller;
 
-    constructor(IControllerFacade _controller) {
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _WETH WETH address
+        @param _uniV2Factory Uniswap V2 Factory address
+        @param _controller Controller Facade
+    */
+    constructor(
+        address _WETH,
+        IUniV2Factory _uniV2Factory,
+        IControllerFacade _controller
+    ) {
+        WETH = _WETH;
+        UNIV2_FACTORY = _uniV2Factory;
         controller = _controller;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address, bool, bytes calldata data)
         external
         view
@@ -55,6 +107,19 @@ contract UniV2Controller is IController {
         return(false, new address[](0), new address[](0));
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Evaluates whether liquidity can be added
+        @param data calldata for adding liquidity
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function addLiquidity(bytes calldata data)
         internal
         view
@@ -72,6 +137,15 @@ contract UniV2Controller is IController {
         return(controller.isTokenAllowed(tokensIn[0]), tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether liquidity can be added
+        @param data calldata for adding liquidity
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function addLiquidityEth(bytes calldata data)
         internal
         view
@@ -88,6 +162,15 @@ contract UniV2Controller is IController {
         return(controller.isTokenAllowed(tokensIn[0]), tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether liquidity can be removed
+        @param data calldata for removing liquidity
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function removeLiquidity(bytes calldata data)
         internal
         view
@@ -105,6 +188,15 @@ contract UniV2Controller is IController {
         return(true, tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether liquidity can be removed
+        @param data calldata for removing liquidity
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function removeLiquidityEth(bytes calldata data)
         internal
         view
@@ -121,6 +213,15 @@ contract UniV2Controller is IController {
         return(true, tokensIn, tokensOut);
     }
 
+    /**
+        @notice Evaluates whether swap can be performed
+        @param data calldata for swapping tokens
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function swapErc20ForErc20(bytes calldata data)
         internal
         view
@@ -142,6 +243,15 @@ contract UniV2Controller is IController {
         );
     }
 
+    /**
+        @notice Evaluates whether swap can be performed
+        @param data calldata for swapping tokens
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function swapEthForErc20(bytes calldata data)
         internal
         view
@@ -160,6 +270,15 @@ contract UniV2Controller is IController {
         );
     }
 
+    /**
+        @notice Evaluates whether swap can be performed
+        @param data calldata for swapping tokens
+        @return canCall Specifies if the interaction is accepted
+        @return tokensIn List of tokens that the account will receive after the
+        interactions
+        @return tokensOut List of tokens that will be removed from the account
+        after the interaction
+    */
     function swapErc20ForEth(bytes calldata data)
         internal
         pure

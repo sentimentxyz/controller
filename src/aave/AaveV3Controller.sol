@@ -1,20 +1,50 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IPoolV3} from "./IPoolV3.sol";
 
+/**
+    @title Aave V3 controller
+    @notice Controller for aave v3 interaction
+*/
 contract AaveV3Controller is IController {
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice supply(address,uint256,address,uint16) function signature
     bytes4 public constant SUPPLY = 0x617ba037;
+
+    /// @notice withdraw(address,uint256,address) function signature
     bytes4 public constant WITHDRAW = 0x69328dec;
 
-    IControllerFacade public controllerFacade;
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
 
+    /// @notice IControllerFacade
+    IControllerFacade public immutable controllerFacade;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract Constructor
+        @param _controller Address of controller facade
+    */
     constructor(IControllerFacade _controller) {
         controllerFacade = _controller;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address target, bool, bytes calldata data)
         external
         view

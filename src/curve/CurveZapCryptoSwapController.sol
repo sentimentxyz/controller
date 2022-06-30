@@ -12,13 +12,6 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
 contract CurveZapCryptoSwapController is IController {
 
     /* -------------------------------------------------------------------------- */
-    /*                               STATE VARIABLES                              */
-    /* -------------------------------------------------------------------------- */
-
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controllerFacade;
-
-    /* -------------------------------------------------------------------------- */
     /*                             CONSTANT VARIABLES                             */
     /* -------------------------------------------------------------------------- */
 
@@ -30,18 +23,6 @@ contract CurveZapCryptoSwapController is IController {
 
     /// @notice remove_liquidity_one_coin(uint256,uint256,uint256) function signature
     bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0xf1dc3cc9;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 CONSTRUCTOR                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-        @notice Contract constructor
-        @param _controllerFacade Address of controller facade
-    */
-    constructor(IControllerFacade _controllerFacade) {
-        controllerFacade = _controllerFacade;
-    }
 
     /* -------------------------------------------------------------------------- */
     /*                              PUBLIC FUNCTIONS                              */

@@ -26,7 +26,7 @@ contract CompoundController is IController {
     bytes4 constant REDEEM = 0xdb006a75;
 
     // keccak256(abi.encodePacked("cETH"))
-    bytes32 constant ethSymbol =
+    bytes32 constant cETH =
         0xb3c46c78043b5ff6963757142af6c297cddb5a0d3d823357472228eb35c8e890;
 
     /* -------------------------------------------------------------------------- */
@@ -54,7 +54,7 @@ contract CompoundController is IController {
         if(sig == REDEEM) {
             tokensOut[0] = target;
 
-            if (keccak256(abi.encodePacked(ICToken(target).symbol())) == ethSymbol)
+            if (keccak256(abi.encodePacked(ICToken(target).symbol())) == cETH)
                 return (true, new address[](0), tokensOut);
 
             tokensIn[0] = ICToken(target).underlying();

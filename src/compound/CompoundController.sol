@@ -6,7 +6,9 @@ import {IController} from "../core/IController.sol";
 
 /**
     @title Compound Controller
-    @notice Controller for compound interaction
+    @notice Controller for compound interaction via cToken
+    cEth - eth:0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5
+    cDai - eth:0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643
 */
 contract CompoundController is IController {
 

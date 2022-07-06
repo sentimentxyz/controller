@@ -10,6 +10,7 @@ interface IYVault {
 /**
     @title Yearn Vault Controller
     @notice Controller for Interacting with yearn vaults
+    arbi:0x239e14A19DFF93a17339DCC444f74406C17f8E67
 */
 contract YearnVaultController is IController {
 

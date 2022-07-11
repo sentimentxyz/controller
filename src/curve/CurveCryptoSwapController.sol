@@ -204,7 +204,7 @@ contract CurveCryptoSwapController is IController {
         tokensOut[0] = IStableSwapPool(target).coins(i);
 
         return (
-            controllerFacade.isTokenAllowed(tokensIn[0]),
+            true,
             tokensIn,
             tokensOut
         );

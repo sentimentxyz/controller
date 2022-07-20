@@ -26,10 +26,10 @@ contract StableSwap2PoolController is IController {
     /// @notice exchange(int128,int128,uint256,uint256)	function signature
     bytes4 public constant EXCHANGE = 0x3df02124;
 
-    /// @notice add_liquidity(uint256[3],uint256) function signature
+    /// @notice add_liquidity(uint256[2],uint256) function signature
     bytes4 public constant ADD_LIQUIDITY = 0x0b4c7e4d;
 
-    /// @notice remove_liquidity(uint256,uint256[3]) function signature
+    /// @notice remove_liquidity(uint256,uint256[2]) function signature
     bytes4 public constant REMOVE_LIQUIDITY = 0x5b36389c;
 
     /// @notice remove_liquidity_one_coin(uint256,int128,uint256) function signature

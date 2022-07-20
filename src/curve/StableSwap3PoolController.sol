@@ -88,7 +88,7 @@ contract StableSwap3PoolController is IController {
         returns (bool, address[] memory, address[] memory)
     {
         address[] memory tokensIn = new address[](1);
-        tokensIn[0] = IStableSwapPool(target).token();
+        tokensIn[0] = target;
 
         uint i; uint j;
         (uint[3] memory amounts) = abi.decode(data[4:], (uint[3]));
@@ -131,7 +131,7 @@ contract StableSwap3PoolController is IController {
         address[] memory tokensOut = new address[](1);
 
         tokensIn[0] = IStableSwapPool(target).coins(uint128(i));
-        tokensOut[0] = IStableSwapPool(target).token();
+        tokensOut[0] = target;
 
         return (true, tokensIn, tokensOut);
     }
@@ -157,7 +157,7 @@ contract StableSwap3PoolController is IController {
         );
 
         address[] memory tokensOut = new address[](1);
-        tokensOut[0] = IStableSwapPool(target).token();
+        tokensOut[0] = target;
 
         uint i; uint j;
         address[] memory tokensIn = new address[](3);

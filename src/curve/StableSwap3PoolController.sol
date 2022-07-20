@@ -7,8 +7,8 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
 
 /**
     @title Curve stable Swap Controller
-    @notice Controller for curve stable swap interaction
-    arbi:0x7f90122BF0700F9E7e1F688fe926940E8839F353
+    @notice Controller for curve stable swap 3 pool interaction
+    arbi:0x30dF229cefa463e991e29D42DB0bae2e122B2AC7
 */
 contract StableSwap3PoolController is IController {
 

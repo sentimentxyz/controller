@@ -3,7 +3,6 @@ pragma solidity 0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IStableSwapPool} from "./IStableSwapPool.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 
 /**
     @title Curve stable Swap Controller
@@ -11,13 +10,6 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
     arbi:0x7f90122BF0700F9E7e1F688fe926940E8839F353
 */
 contract StableSwap2PoolController is IController {
-
-    /* -------------------------------------------------------------------------- */
-    /*                               STATE VARIABLES                              */
-    /* -------------------------------------------------------------------------- */
-
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controllerFacade;
 
     /* -------------------------------------------------------------------------- */
     /*                             CONSTANT VARIABLES                             */
@@ -34,18 +26,6 @@ contract StableSwap2PoolController is IController {
 
     /// @notice remove_liquidity_one_coin(uint256,int128,uint256) function signature
     bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0x1a4d01d2;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 CONSTRUCTOR                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-        @notice Contract constructor
-        @param _controllerFacade Address of controller facade
-    */
-    constructor(IControllerFacade _controllerFacade) {
-        controllerFacade = _controllerFacade;
-    }
 
     /* -------------------------------------------------------------------------- */
     /*                              PUBLIC FUNCTIONS                              */

@@ -3,7 +3,6 @@ pragma solidity 0.8.15;
 
 import {IController} from "../core/IController.sol";
 import {IStableSwapPool} from "./IStableSwapPool.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 
 /**
     @title Curve Crypto Swap Controller
@@ -11,13 +10,6 @@ import {IControllerFacade} from "../core/IControllerFacade.sol";
     arbi:0x960ea3e3C7FB317332d990873d354E18d7645590
 */
 contract CurveCryptoSwapController is IController {
-
-    /* -------------------------------------------------------------------------- */
-    /*                               STATE VARIABLES                              */
-    /* -------------------------------------------------------------------------- */
-
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controllerFacade;
 
     /* -------------------------------------------------------------------------- */
     /*                             CONSTANT VARIABLES                             */
@@ -34,18 +26,6 @@ contract CurveCryptoSwapController is IController {
 
     /// @notice remove_liquidity_one_coin(uint256,uint256,uint256) function signature
     bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0xf1dc3cc9;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 CONSTRUCTOR                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-        @notice Contract constructor
-        @param _controllerFacade Address of controller facade
-    */
-    constructor(IControllerFacade _controllerFacade) {
-        controllerFacade = _controllerFacade;
-    }
 
     /* -------------------------------------------------------------------------- */
     /*                              PUBLIC FUNCTIONS                              */
@@ -195,7 +175,7 @@ contract CurveCryptoSwapController is IController {
 
         if (useEth)
             return (
-                controllerFacade.isTokenAllowed(tokensIn[0]),
+                true,
                 tokensIn,
                 new address[](0)
             );

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.15;
 
-import "forge-std/console.sol";
 import {Ownable} from "src/utils/Ownable.sol";
 import {IController} from "src/core/IController.sol";
 import {BytesLib} from "solidity-bytes-utils/BytesLib.sol";

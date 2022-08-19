@@ -4,7 +4,6 @@ pragma solidity 0.8.15;
 import "src/core/IController.sol";
 import "src/core/IControllerFacade.sol";
 import "./interface/IVault.sol";
-import "forge-std/console.sol";
 
 contract BalancerController is IController {
 
@@ -45,7 +44,6 @@ contract BalancerController is IController {
                 bytes32, address, address, IVault.JoinPoolRequest
             )
         );
-        console.logUint(2);
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](request.assets.length);
 

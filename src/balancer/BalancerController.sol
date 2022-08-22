@@ -9,6 +9,8 @@ contract BalancerController is IController {
 
     bytes4 constant JOIN = 0xb95cac28;
     bytes4 constant EXIT = 0x8bdb3913;
+    bytes4 constant SWAP = 0x52bbbe29;
+    bytes4 constant BATCH_SWAP = 0x945bcec9;
 
     IControllerFacade immutable controllerFacade;
 
@@ -27,6 +29,10 @@ contract BalancerController is IController {
             return canJoin(target, useEth, data[4:]);
         if (sig == EXIT)
             return canExit(target, useEth, data[4:]);
+        if (sig == SWAP)
+            return canSwap(target, useEth, data[4:]);
+        if (sig == BATCH_SWAP)
+            return canBatchSwap(target, useEth, data[4:]);
         return (false, new address[](0), new address[](0));
     }
 
@@ -99,6 +105,108 @@ contract BalancerController is IController {
 
         return (
             true,
+            tokensIn,
+            tokensOut
+        );
+    }
+
+    function canSwap(address, bool, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        (
+            IVault.SingleSwap memory swap,
+            ,
+            ,
+        ) = abi.decode(data, (
+                IVault.SingleSwap, IVault.FundManagement, uint256, uint256
+            )
+        );
+
+        address[] memory tokensIn;
+        address[] memory tokensOut;
+
+        if (address(swap.assetIn) == address(0)) {
+            tokensIn = new address[](1);
+            tokensIn[0] = address(swap.assetOut);
+            return (
+                controllerFacade.isTokenAllowed(tokensIn[0]),
+                tokensIn,
+                new address[](0)
+            );
+        }
+
+        if (address(swap.assetOut) == address(0)) {
+            tokensOut = new address[](1);
+            tokensOut[0] = address(swap.assetIn);
+            return (
+                true,
+                new address[](0),
+                tokensOut
+            );
+        }
+
+        tokensIn = new address[](1);
+        tokensOut = new address[](1);
+        tokensOut[0] = address(swap.assetIn);
+        tokensIn[0] = address(swap.assetOut);
+        return (
+            controllerFacade.isTokenAllowed(tokensIn[0]),
+            tokensIn,
+            tokensOut
+        );
+    }
+
+    function canBatchSwap(address, bool, bytes calldata data)
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
+        (
+            ,
+            IVault.BatchSwapStep[] memory swaps,
+            IAsset[] memory assets,
+            ,
+            ,
+        ) = abi.decode(data, (
+                uint8, IVault.BatchSwapStep[], IAsset[], IVault.FundManagement, uint256[], uint256
+            )
+        );
+
+        uint steps = swaps.length;
+        uint tokenInIndex = swaps[steps - 1].assetOutIndex;
+        uint tokenOutIndex = swaps[0].assetInIndex;
+
+        address[] memory tokensIn;
+        address[] memory tokensOut;
+
+        if (address(assets[tokenOutIndex]) == address(0)) {
+            tokensIn = new address[](1);
+            tokensIn[0] = address(assets[tokenInIndex]);
+            return (
+                controllerFacade.isTokenAllowed(tokensIn[0]),
+                tokensIn,
+                new address[](0)
+            );
+        }
+
+        if (address(assets[tokenInIndex]) == address(0)) {
+            tokensOut = new address[](1);
+            tokensOut[0] = address(assets[tokenOutIndex]);
+            return (
+                true,
+                new address[](0),
+                tokensOut
+            );
+        }
+
+        tokensIn = new address[](1);
+        tokensOut = new address[](1);
+        tokensOut[0] = address(assets[tokenOutIndex]);
+        tokensIn[0] = address(assets[tokenInIndex]);
+        return (
+            controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
             tokensOut
         );

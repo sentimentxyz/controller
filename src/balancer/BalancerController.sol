@@ -3,7 +3,7 @@ pragma solidity 0.8.15;
 
 import "src/core/IController.sol";
 import "src/core/IControllerFacade.sol";
-import "./interface/IVault.sol";
+import "./IVault.sol";
 
 contract BalancerController is IController {
 
@@ -151,6 +151,7 @@ contract BalancerController is IController {
         tokensOut = new address[](1);
         tokensOut[0] = address(swap.assetIn);
         tokensIn[0] = address(swap.assetOut);
+
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
@@ -174,8 +175,10 @@ contract BalancerController is IController {
             )
         );
 
-        uint steps = swaps.length;
-        uint tokenInIndex = swaps[steps - 1].assetOutIndex;
+        if (!isMultiHopSwap(swaps))
+            return (false, new address[](0), new address[](0));
+
+        uint tokenInIndex = swaps[swaps.length - 1].assetOutIndex;
         uint tokenOutIndex = swaps[0].assetInIndex;
 
         address[] memory tokensIn;
@@ -205,10 +208,24 @@ contract BalancerController is IController {
         tokensOut = new address[](1);
         tokensOut[0] = address(assets[tokenOutIndex]);
         tokensIn[0] = address(assets[tokenInIndex]);
+
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
             tokensIn,
             tokensOut
         );
+    }
+
+    function isMultiHopSwap(IVault.BatchSwapStep[] memory swaps)
+        internal
+        pure
+        returns (bool)
+    {
+        uint steps = swaps.length;
+        for (uint i; i < steps - 1; i++) {
+            if (swaps[i].assetOutIndex != swaps[i+1].assetInIndex)
+                return false;
+        }
+        return true;
     }
 }

@@ -5,19 +5,44 @@ import "src/core/IController.sol";
 import "src/core/IControllerFacade.sol";
 import "./IVault.sol";
 
+/**
+    @title Balancer V2 Controller
+    @notice Balance v2 controller for join/exit/swap/batchSwap (multiHop)
+*/
 contract BalancerController is IController {
+
+    /* -------------------------------------------------------------------------- */
+    /*                             CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
 
     bytes4 constant JOIN = 0xb95cac28;
     bytes4 constant EXIT = 0x8bdb3913;
     bytes4 constant SWAP = 0x52bbbe29;
     bytes4 constant BATCH_SWAP = 0x945bcec9;
 
+    /* -------------------------------------------------------------------------- */
+    /*                               STATE_VARIABLES                              */
+    /* -------------------------------------------------------------------------- */
+
     IControllerFacade immutable controllerFacade;
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 CONSTRUCTOR                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+        @notice Contract constructor
+        @param _controller Controller Facade
+    */
     constructor(IControllerFacade _controller) {
         controllerFacade = _controller;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                              EXTERNAL FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
     function canCall(address target, bool useEth, bytes calldata data)
         external
         view
@@ -35,6 +60,10 @@ contract BalancerController is IController {
             return canBatchSwap(target, useEth, data[4:]);
         return (false, new address[](0), new address[](0));
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
 
     function canJoin(address target, bool, bytes calldata data)
         internal

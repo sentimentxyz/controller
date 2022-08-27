@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity ^0.8.15;
 
 import {ISwapRouterV3} from "./ISwapRouterV3.sol";
 import {IController} from "../core/IController.sol";

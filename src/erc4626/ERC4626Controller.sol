@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {IController} from "src/core/IController.sol";
+import {IController} from "../core/IController.sol";
 import {IERC4626} from "./IERC4626.sol";
 
 /**

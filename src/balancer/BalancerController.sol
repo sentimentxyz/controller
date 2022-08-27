@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.15;
 
-import "src/core/IController.sol";
-import "src/core/IControllerFacade.sol";
-import "./IVault.sol";
+import {IController} from "src/core/IController.sol";
+import {IControllerFacade} from "src/core/IControllerFacade.sol";
+import {IVault} from "./IVault.sol";
 
 /**
     @title Balancer V2 Controller
@@ -21,7 +21,7 @@ contract BalancerController is IController {
     /// @notice exitPool(bytes32,address,address,(address[],uint256[],bytes,bool))
     bytes4 constant EXIT = 0x8bdb3913;
 
-    /// @notice swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)	
+    /// @notice swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)
     bytes4 constant SWAP = 0x52bbbe29;
 
     /* -------------------------------------------------------------------------- */

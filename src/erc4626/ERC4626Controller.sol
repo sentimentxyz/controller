@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.15;
 
-import "src/core/IController.sol";
-import "./IERC4626.sol";
+import {IController} from "src/core/IController.sol";
+import {IERC4626} from "./IERC4626.sol";
 
+/**
+    @title ERC4626 vault controller
+*/
 contract ERC4626Controller is IController {
 
     /* -------------------------------------------------------------------------- */
     /*                             CONSTANT VARIABLES                             */
     /* -------------------------------------------------------------------------- */
 
+    /// @notice deposit(uint256,address)
     bytes4 constant DEPOSIT = 0x6e553f65;
+
+    /// @notice mint(uint256,address)
     bytes4 constant MINT = 0x94bf804d;
+
+    /// @notice redeem(uint256,address,address)
     bytes4 constant REDEEM = 0xba087652;
+
+    /// @notice withdraw(uint256,address,address)
     bytes4 constant WITHDRAW = 0xb460af94;
 
     /* -------------------------------------------------------------------------- */

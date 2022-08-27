@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
-
+pragma solidity >=0.8.0;
 import {IController} from "../core/IController.sol";
 import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IPoolV3} from "./IPoolV3.sol";

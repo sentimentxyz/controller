@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity >=0.8.0;
 
 import {TestBase} from "./utils/Base.t.sol";
 import {IVault} from "src/balancer/IVault.sol";

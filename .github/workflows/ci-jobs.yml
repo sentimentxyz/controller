@@ -20,5 +20,8 @@ jobs:
         with:
           version: nightly
 
-      - name: Run tests
-        run: forge test --fork-url https://rpc.ankr.com/eth
+      - name: Run mainnet tests
+        run: forge test --mc Mainnet --fork-url https://rpc.ankr.com/eth
+
+      - name: Run arbitrum tests
+        run: forge test --mc Arbitrum --fork-url https://arb1.arbitrum.io/rpc

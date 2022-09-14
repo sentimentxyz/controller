@@ -5,7 +5,7 @@ import {TestBase} from "./utils/Base.t.sol";
 import {IVault, IAsset} from "../balancer/IVault.sol";
 import {BalancerController} from "../balancer/BalancerController.sol";
 
-contract TestBalancer is TestBase {
+contract TestBalancerMainnet is TestBase {
 
     BalancerController balancerController;
 

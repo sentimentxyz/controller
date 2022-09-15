@@ -4,13 +4,35 @@ pragma solidity ^0.8.15;
 import {IController} from "../core/IController.sol";
 import {IVault} from "./IVault.sol";
 
+/**
+    @title Beefy Vault (V6 and V7) controller
+    @notice Controller for interacting with beefy vaults (V6 and V7)
+*/
 contract BeefyController is IController {
 
+    /* -------------------------------------------------------------------------- */
+    /*                              CONSTANT VARIABLES                             */
+    /* -------------------------------------------------------------------------- */
+
+    /// @notice deposit(uint256)
     bytes4 constant DEPOSIT = 0xb6b55f25;
+
+    /// @notice depositAll()
     bytes4 constant DEPOSIT_ALL = 0xde5f6268;
+
+    /// @notice withdraw(uint256)
     bytes4 constant WITHDRAW = 0x2e1a7d4d;
+
+    /// @notice withdrawAll()
     bytes4 constant WITHDRAW_ALL = 0x853828b6;
 
+    /* -------------------------------------------------------------------------- */
+    /*                              PUBLIC FUNCTIONS                              */
+    /* -------------------------------------------------------------------------- */
+
+    /// @inheritdoc IController
+    /// @dev target address it the vault account wants to integrate with,
+    /// hence adding a vault also implies adding its underlying token
     function canCall(address target, bool, bytes calldata data)
         external
         view

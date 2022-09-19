@@ -31,8 +31,9 @@ contract BeefyController is IController {
     /* -------------------------------------------------------------------------- */
 
     /// @inheritdoc IController
-    /// @dev target address it the vault account wants to integrate with,
-    /// hence adding a vault also implies adding its underlying token
+    /// @dev Controller logic does not need to verify the address of inbound or
+    /// outbound tokens against isTokenAllowed since the target address corresponds
+    /// to the vault itself and each beefy vault only deals with two unique tokens
     function canCall(address target, bool, bytes calldata data)
         external
         view

@@ -123,10 +123,7 @@ contract BalancerController is IController {
 
         uint i; uint j;
         while(i < request.assets.length) {
-            if (
-                request.minAmountsOut[i] > 0 &&
-                address(request.assets[i]) != address(0)
-            )
+            if (address(request.assets[i]) != address(0))
                 tokensIn[j++] = address(request.assets[i]);
             unchecked { ++i; }
         }
@@ -135,7 +132,7 @@ contract BalancerController is IController {
         (tokensOut[0],) = IVault(target).getPool(poolId);
 
         return (
-            true,
+            controllerFacade.isTokenAllowed(tokensOut[0]),
             tokensIn,
             tokensOut
         );

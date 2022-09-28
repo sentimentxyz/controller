@@ -42,7 +42,7 @@ contract StableSwap3PoolController is IController {
         if (sig == ADD_LIQUIDITY) return canAddLiquidity(target, data);
         if (sig == REMOVE_LIQUIDITY_ONE_COIN)
             return canRemoveLiquidityOneCoin(target, data);
-        if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity(target, data);
+        if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity(target);
         if (sig == EXCHANGE) return canExchange(target, data);
 
         return (false, new address[](0), new address[](0));
@@ -119,34 +119,24 @@ contract StableSwap3PoolController is IController {
     /**
         @notice Evaluates whether protocol can remove liquidity from the target contract
         @param target External protocol address
-        @param data calldata of the interaction with the target address
         @return canCall Specifies if the interaction is accepted
         @return tokensIn List of tokens that the account will receive after the
         interactions
         @return tokensOut List of tokens that will be removed from the account
         after the interaction
     */
-    function canRemoveLiquidity(address target, bytes calldata data)
+    function canRemoveLiquidity(address target)
         internal
         view
         returns (bool, address[] memory, address[] memory)
     {
-        (,uint256[3] memory amounts) = abi.decode(
-            data[4:],
-            (uint256, uint256[3])
-        );
-
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = target;
 
-        uint i; uint j;
         address[] memory tokensIn = new address[](3);
-        while(i < 3) {
-            if(amounts[i] > 0)
-                tokensIn[j++] = IStableSwapPool(target).coins(i);
-            unchecked { ++i; }
-        }
-        assembly { mstore(tokensIn, j) }
+        tokensIn[0] = IStableSwapPool(target).coins(0);
+        tokensIn[1] = IStableSwapPool(target).coins(1);
+        tokensIn[2] = IStableSwapPool(target).coins(2);
 
         return (true, tokensIn, tokensOut);
     }

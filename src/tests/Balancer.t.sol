@@ -104,7 +104,8 @@ contract TestBalancer is TestBase {
     }
 
     function testCanExit() public {
-        // Test
+        // Setup
+        controllerFacade.toggleTokenAllowance(0xCfCA23cA9CA720B6E98E3Eb9B6aa0fFC4a5C08B9);
         bytes32 poolId = 0xcfca23ca9ca720b6e98e3eb9b6aa0ffc4a5c08b9000200000000000000000274;
         address sender = 0xABBb9Eb2512904123f9d372f26e2390a190d8550;
         address receiver = 0xABBb9Eb2512904123f9d372f26e2390a190d8550;
@@ -135,7 +136,7 @@ contract TestBalancer is TestBase {
             request
         );
 
-        // Setup
+        // Test
         (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
             = controllerFacade.canCall(vault, true, data);
 
@@ -144,6 +145,6 @@ contract TestBalancer is TestBase {
         // Assert
         assertTrue(canCall);
         assertEq(tokensOut[0], token);
-        assertEq(tokensIn.length, 0);
+        assertEq(tokensIn.length, 1);
     }
 }

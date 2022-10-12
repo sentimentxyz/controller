@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IVault} from "./IVault.sol";
 
 /**
@@ -23,24 +22,6 @@ contract BalancerController is IController {
 
     /// @notice swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)
     bytes4 constant SWAP = 0x52bbbe29;
-
-    /* -------------------------------------------------------------------------- */
-    /*                               STATE_VARIABLES                              */
-    /* -------------------------------------------------------------------------- */
-
-    IControllerFacade immutable controllerFacade;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 CONSTRUCTOR                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-        @notice Contract constructor
-        @param _controller Controller Facade
-    */
-    constructor(IControllerFacade _controller) {
-        controllerFacade = _controller;
-    }
 
     /* -------------------------------------------------------------------------- */
     /*                              EXTERNAL FUNCTIONS                              */
@@ -98,7 +79,7 @@ contract BalancerController is IController {
         (tokensIn[0],) = IVault(target).getPool(poolId);
 
         return (
-            controllerFacade.isTokenAllowed(tokensIn[0]),
+            true,
             tokensIn,
             tokensOut
         );
@@ -132,7 +113,7 @@ contract BalancerController is IController {
         (tokensOut[0],) = IVault(target).getPool(poolId);
 
         return (
-            controllerFacade.isTokenAllowed(tokensOut[0]),
+            true,
             tokensIn,
             tokensOut
         );
@@ -140,7 +121,7 @@ contract BalancerController is IController {
 
     function canSwap(address, bool, bytes calldata data)
         internal
-        view
+        pure
         returns (bool, address[] memory, address[] memory)
     {
         (
@@ -159,7 +140,7 @@ contract BalancerController is IController {
             tokensIn = new address[](1);
             tokensIn[0] = address(swap.assetOut);
             return (
-                controllerFacade.isTokenAllowed(tokensIn[0]),
+                true,
                 tokensIn,
                 new address[](0)
             );
@@ -181,7 +162,7 @@ contract BalancerController is IController {
         tokensIn[0] = address(swap.assetOut);
 
         return (
-            controllerFacade.isTokenAllowed(tokensIn[0]),
+            true,
             tokensIn,
             tokensOut
         );

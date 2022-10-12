@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IPoolV3} from "./IPoolV3.sol";
 
 /**
@@ -21,25 +20,6 @@ contract AaveV3Controller is IController {
 
     /// @notice withdraw(address,uint256,address) function signature
     bytes4 public constant WITHDRAW = 0x69328dec;
-
-    /* -------------------------------------------------------------------------- */
-    /*                               STATE VARIABLES                              */
-    /* -------------------------------------------------------------------------- */
-
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controllerFacade;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 CONSTRUCTOR                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-        @notice Contract Constructor
-        @param _controller Address of controller facade
-    */
-    constructor(IControllerFacade _controller) {
-        controllerFacade = _controller;
-    }
 
     /* -------------------------------------------------------------------------- */
     /*                              PUBLIC FUNCTIONS                              */
@@ -62,7 +42,7 @@ contract AaveV3Controller is IController {
             tokensIn[0] = IPoolV3(target).getReserveData(asset).aTokenAddress;
             tokensOut[0] = asset;
             return (
-                controllerFacade.isTokenAllowed(tokensIn[0]),
+                true,
                 tokensIn,
                 tokensOut
             );

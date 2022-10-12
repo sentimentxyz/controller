@@ -46,9 +46,29 @@ contract ControllerFacade is Ownable, IControllerFacade {
         address target,
         bool useEth,
         bytes calldata data
-    ) external view returns (bool, address[] memory, address[] memory) {
-        return controllerFor[target].canCall(target, useEth, data);
+    )
+        external
+        view
+        returns (bool isValid, address[] memory tokensIn, address[] memory tokensOut)
+    {
+        (, tokensIn, tokensOut) = controllerFor[target].canCall(target, useEth, data);
+        isValid = isValidTokens(tokensIn);
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                              INTERNAL FUNCTIONS                            */
+    /* -------------------------------------------------------------------------- */
+
+    function isValidTokens(address[] memory tokensIn)
+        internal
+        view
+        returns (bool)
+    {
+        for (uint i; i < tokensIn.length; i++)
+            if (!isTokenAllowed[tokensIn[i]]) return false;
+        return true;
+    }
+
 
     /* -------------------------------------------------------------------------- */
     /*                               ADMIN FUNCTIONS                              */

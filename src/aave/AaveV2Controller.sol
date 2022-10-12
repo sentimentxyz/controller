@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IProtocolDataProvider} from "./IProtocolDataProvider.sol";
 
 /**
@@ -32,24 +31,18 @@ contract AaveV2Controller is IController {
     */
     IProtocolDataProvider public immutable dataProvider;
 
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controllerFacade;
-
     /* -------------------------------------------------------------------------- */
     /*                                 CONSTRUCTOR                                */
     /* -------------------------------------------------------------------------- */
 
     /**
         @notice Contract constructor
-        @param _controller address of controller Facade
         @param _dataProvider address of aave v2 data provider
     */
     constructor(
-        IControllerFacade _controller,
         IProtocolDataProvider _dataProvider
     )
     {
-        controllerFacade = _controller;
         dataProvider = _dataProvider;
     }
 
@@ -74,7 +67,7 @@ contract AaveV2Controller is IController {
             (tokensIn[0],,) = dataProvider.getReserveTokensAddresses(asset);
             tokensOut[0] = asset;
             return (
-                controllerFacade.isTokenAllowed(tokensIn[0]),
+                true,
                 tokensIn,
                 tokensOut
             );

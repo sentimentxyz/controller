@@ -52,14 +52,14 @@ contract ControllerFacade is Ownable, IControllerFacade {
         returns (bool isValid, address[] memory tokensIn, address[] memory tokensOut)
     {
         (isValid, tokensIn, tokensOut) = controllerFor[target].canCall(target, useEth, data);
-        if (isValid) isValid = isValidTokens(tokensIn);
+        if (isValid) isValid = validateTokensIn(tokensIn);
     }
 
     /* -------------------------------------------------------------------------- */
     /*                              INTERNAL FUNCTIONS                            */
     /* -------------------------------------------------------------------------- */
 
-    function isValidTokens(address[] memory tokensIn)
+    function validateTokensIn(address[] memory tokensIn)
         internal
         view
         returns (bool)

@@ -13,7 +13,7 @@ contract TestBalancer is TestBase {
 
     function setUp() public {
         setupControllerFacade();
-        balancerController = new BalancerController(controllerFacade);
+        balancerController = new BalancerController();
         controllerFacade.updateController(vault, balancerController);
     }
 
@@ -106,6 +106,7 @@ contract TestBalancer is TestBase {
     function testCanExit() public {
         // Setup
         controllerFacade.toggleTokenAllowance(0xCfCA23cA9CA720B6E98E3Eb9B6aa0fFC4a5C08B9);
+        controllerFacade.toggleTokenAllowance(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
         bytes32 poolId = 0xcfca23ca9ca720b6e98e3eb9b6aa0ffc4a5c08b9000200000000000000000274;
         address sender = 0xABBb9Eb2512904123f9d372f26e2390a190d8550;
         address receiver = 0xABBb9Eb2512904123f9d372f26e2390a190d8550;

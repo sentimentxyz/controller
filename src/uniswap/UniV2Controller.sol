@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
-import {IControllerFacade} from "../core/IControllerFacade.sol";
 import {IUniV2Factory} from "./IUniV2Factory.sol";
 
 /**
@@ -56,9 +55,6 @@ contract UniV2Controller is IController {
     /// @notice Uniswap v2 factory
     IUniV2Factory public immutable UNIV2_FACTORY;
 
-    /// @notice IControllerFacade
-    IControllerFacade public immutable controller;
-
     /* -------------------------------------------------------------------------- */
     /*                                 CONSTRUCTOR                                */
     /* -------------------------------------------------------------------------- */
@@ -67,16 +63,13 @@ contract UniV2Controller is IController {
         @notice Contract constructor
         @param _WETH WETH address
         @param _uniV2Factory Uniswap V2 Factory address
-        @param _controller Controller Facade
     */
     constructor(
         address _WETH,
-        IUniV2Factory _uniV2Factory,
-        IControllerFacade _controller
+        IUniV2Factory _uniV2Factory
     ) {
         WETH = _WETH;
         UNIV2_FACTORY = _uniV2Factory;
-        controller = _controller;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -135,7 +128,7 @@ contract UniV2Controller is IController {
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = UNIV2_FACTORY.getPair(tokenA, tokenB);
 
-        return(controller.isTokenAllowed(tokensIn[0]), tokensIn, tokensOut);
+        return(true, tokensIn, tokensOut);
     }
 
     /**
@@ -160,7 +153,7 @@ contract UniV2Controller is IController {
         address[] memory tokensIn = new address[](1);
         tokensIn[0] = UNIV2_FACTORY.getPair(token, WETH);
 
-        return(controller.isTokenAllowed(tokensIn[0]), tokensIn, tokensOut);
+        return(true, tokensIn, tokensOut);
     }
 
     /**
@@ -225,7 +218,7 @@ contract UniV2Controller is IController {
     */
     function swapErc20ForErc20(bytes calldata data)
         internal
-        view
+        pure
         returns (bool, address[] memory, address[] memory)
     {
         (,, address[] memory path,,)
@@ -238,7 +231,7 @@ contract UniV2Controller is IController {
         tokensIn[0] = path[path.length - 1];
 
         return(
-            controller.isTokenAllowed(tokensIn[0]),
+            true,
             tokensIn,
             tokensOut
         );
@@ -255,7 +248,7 @@ contract UniV2Controller is IController {
     */
     function swapEthForErc20(bytes calldata data)
         internal
-        view
+        pure
         returns (bool, address[] memory, address[] memory)
     {
         (, address[] memory path,,)
@@ -265,7 +258,7 @@ contract UniV2Controller is IController {
         tokensIn[0] = path[path.length - 1];
 
         return (
-            controller.isTokenAllowed(tokensIn[0]),
+            true,
             tokensIn,
             new address[](0)
         );

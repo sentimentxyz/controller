@@ -46,11 +46,11 @@ contract CurveLPStakingController is IController {
     {
         bytes4 sig = bytes4(data);
 
-        if (sig == DEPOSIT) canDeposit(target);
-        if (sig == DEPOSITCLAIM) canDepositAndClaim(target);
-        if (sig == WITHDRAW) canWithdraw(target);
-        if (sig == WITHDRAWCLAIM) canWithdrawAndClaim(target);
-        if (sig == CLAIM) canClaim(target);
+        if (sig == DEPOSIT) return canDeposit(target);
+        if (sig == DEPOSITCLAIM) return canDepositAndClaim(target);
+        if (sig == WITHDRAW) return canWithdraw(target);
+        if (sig == WITHDRAWCLAIM) return canWithdrawAndClaim(target);
+        if (sig == CLAIM) return canClaim(target);
 
         return (false, new address[](0), new address[](0));
     }

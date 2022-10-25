@@ -78,7 +78,7 @@ contract BalancerLPStakingController is IController {
         address reward; uint i;
         for (; i<rewardsCount; i++) {
             reward = IChildGauge(target).reward_tokens(i);
-            if (reward == address(0)) {}
+            if (reward == address(0)) break;
             tokensIn[i] = reward;
         }
         tokensIn[i] = target;
@@ -111,16 +111,13 @@ contract BalancerLPStakingController is IController {
         address[] memory tokensIn = new address[](rewardsCount + 1);
         address reward;
         uint i;
-
         for (; i<rewardsCount; i++) {
             reward = IChildGauge(target).reward_tokens(i);
-            if (reward == address(0)) {}
+            if (reward == address(0)) break;
             tokensIn[i] = reward;
         }
-
         tokensIn[i] = IChildGauge(target).lp_token();
         i++;
-
         assembly { mstore(tokensIn, i) }
 
         address[] memory tokensOut = new address[](1);

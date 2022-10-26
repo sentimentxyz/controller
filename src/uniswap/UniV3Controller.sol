@@ -169,8 +169,8 @@ contract UniV3Controller is IController {
         address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
 
-        tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
-        tokensOut[0] = params.path.toAddress(0);
+        tokensOut[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
+        tokensIn[0] = params.path.toAddress(0);
 
         return (
             controllerFacade.isTokenAllowed(tokensIn[0]),
@@ -297,7 +297,7 @@ contract UniV3Controller is IController {
         // Swapping Eth <-> ERC20
         if (useEth && bytes4(multiData[1]) == REFUND_ETH) {
             address[] memory tokensIn = new address[](1);
-            tokensIn[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
+            tokensIn[0] = params.path.toAddress(0);
             return (
                 controllerFacade.isTokenAllowed(tokensIn[0]),
                 tokensIn,
@@ -308,7 +308,7 @@ contract UniV3Controller is IController {
         // Swapping ERC20 <-> ETH
         if (bytes4(multiData[1]) == UNWRAP_ETH) {
             address[] memory tokensOut = new address[](1);
-            tokensOut[0] = params.path.toAddress(0);
+            tokensOut[0] = params.path.toAddress(params.path.length - ADDR_SIZE);
             return (true, new address[](0), tokensOut);
         }
 

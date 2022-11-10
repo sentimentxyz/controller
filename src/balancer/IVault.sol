@@ -59,7 +59,7 @@ interface IVault {
     }
 
     function batchSwap(
-        uint8 kind,
+        SwapKind kind,
         BatchSwapStep[] memory swaps,
         IAsset[] memory assets,
         FundManagement memory funds,
@@ -74,4 +74,6 @@ interface IVault {
         uint256 amount;
         bytes userData;
     }
+
+    enum SwapKind { GIVEN_IN, GIVEN_OUT }
 }

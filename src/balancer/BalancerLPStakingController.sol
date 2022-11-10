@@ -27,8 +27,8 @@ contract BalancerLPStakingController is IController {
     /// @notice withdraw(uint256)
     bytes4 constant WITHDRAW = 0x2e1a7d4d;
 
-    /// @notice withdraw(uint256,address,bool)
-    bytes4 constant WITHDRAWCLAIM = 0x00ebf5dd;
+    /// @notice withdraw(uint256,bool)
+    bytes4 constant WITHDRAWCLAIM = 0x38d07436;
 
     /// @notice claim_rewards()
     bytes4 constant CLAIM = 0xe6f1daf2;
@@ -49,9 +49,9 @@ contract BalancerLPStakingController is IController {
         bytes4 sig = bytes4(data);
 
         if (sig == DEPOSIT) return canDeposit(target);
-        if (sig == DEPOSITCLAIM) return canDepositAndClaim(target);
+        if (sig == DEPOSITCLAIM) return canDepositAndClaim(target, data);
         if (sig == WITHDRAW) return canWithdraw(target);
-        if (sig == WITHDRAWCLAIM) return canWithdrawAndClaim(target);
+        if (sig == WITHDRAWCLAIM) return canWithdrawAndClaim(target, data);
         if (sig == CLAIM) return canClaim(target);
 
         return (false, new address[](0), new address[](0));
@@ -69,11 +69,17 @@ contract BalancerLPStakingController is IController {
         return (true, tokensIn, tokensOut);
     }
 
-    function canDepositAndClaim(address target)
+    function canDepositAndClaim(address target, bytes calldata data)
         internal
         view
         returns (bool, address[] memory, address[] memory)
     {
+        (,,bool claim) = abi.decode(
+            data[4:], (uint256, address, bool)
+        );
+
+        if (!claim) return canDeposit(target);
+
         address[] memory tokensIn = new address[](rewardsCount + 1);
         address reward; uint i;
         for (; i<rewardsCount; i++) {
@@ -103,11 +109,18 @@ contract BalancerLPStakingController is IController {
         return (true, tokensIn, tokensOut);
     }
 
-    function canWithdrawAndClaim(address target)
+    function canWithdrawAndClaim(address target, bytes calldata data)
         internal
         view
         returns (bool, address[] memory, address[] memory)
     {
+
+        (,bool claim) = abi.decode(
+            data[4:], (uint256, bool)
+        );
+
+        if (!claim) return canWithdraw(target);
+
         address[] memory tokensIn = new address[](rewardsCount + 1);
         address reward;
         uint i;

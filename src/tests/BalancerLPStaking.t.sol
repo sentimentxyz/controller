@@ -50,7 +50,7 @@ contract TestBalancerStakingArbi is TestBase {
         assertTrue(!canCall);
     }
 
-    function testCanDepositAndClaim() public {
+    function testCanDepositAndClaim(bool claim) public {
         // Setup
         controllerFacade.toggleTokenAllowance(gauge);
         controllerFacade.toggleTokenAllowance(r1);
@@ -59,7 +59,7 @@ contract TestBalancerStakingArbi is TestBase {
         bytes memory data = abi.encodeWithSelector(0x83df6747,
             0,
             address(0),
-            true
+            claim
         );
 
         // Test
@@ -68,11 +68,16 @@ contract TestBalancerStakingArbi is TestBase {
 
         // Assert
         assertTrue(canCall);
-        assertEq(tokensIn[0], r1);
-        assertEq(tokensIn[1], r2);
-        assertEq(tokensIn[2], gauge);
-        assertEq(tokensIn.length, 3);
         assertEq(tokensOut[0], lp);
+        if (claim) {
+            assertEq(tokensIn[0], r1);
+            assertEq(tokensIn[1], r2);
+            assertEq(tokensIn[2], gauge);
+            assertEq(tokensIn.length, 3);
+        } else {
+            assertEq(tokensIn[0], gauge);
+            assertEq(tokensIn.length, 1);
+        }
     }
 
     function testCannotDepositAndClaim() public {
@@ -90,16 +95,15 @@ contract TestBalancerStakingArbi is TestBase {
         assertTrue(!canCall);
     }
 
-    function testCanWithdrawAndClaim() public {
+    function testCanWithdrawAndClaim(bool claim) public {
         // Setup
         controllerFacade.toggleTokenAllowance(lp);
         controllerFacade.toggleTokenAllowance(r1);
         controllerFacade.toggleTokenAllowance(r2);
 
-        bytes memory data = abi.encodeWithSelector(0x00ebf5dd,
+        bytes memory data = abi.encodeWithSelector(0x38d07436,
             0,
-            address(0),
-            true
+            claim
         );
 
         // Test
@@ -108,17 +112,22 @@ contract TestBalancerStakingArbi is TestBase {
 
         // Assert
         assertTrue(canCall);
-        assertEq(tokensIn[0], r1);
-        assertEq(tokensIn[1], r2);
-        assertEq(tokensIn[2], lp);
-        assertEq(tokensIn.length, 3);
         assertEq(tokensOut[0], gauge);
+
+        if (claim) {
+            assertEq(tokensIn[0], r1);
+            assertEq(tokensIn[1], r2);
+            assertEq(tokensIn[2], lp);
+            assertEq(tokensIn.length, 3);
+        } else {
+            assertEq(tokensIn[0], lp);
+            assertEq(tokensIn.length, 1);
+        }
     }
 
     function testCannotWithdrawAndClaim() public {
-        bytes memory data = abi.encodeWithSelector(0x00ebf5dd,
+        bytes memory data = abi.encodeWithSelector(0x38d07436,
             0,
-            address(0),
             true
         );
 

@@ -24,4 +24,4 @@ jobs:
         run: forge test --no-match-contract Arbi --fork-url https://rpc.ankr.com/eth
 
       - name: Run arbitrum tests
-        run: forge test --mc Arbi --fork-url https://arb-mainnet.g.alchemy.com/v2/WyhayD-L2Ox60Yngd6nzQvDKWtsCoCne
+        run: forge test --mc Arbi --fork-url  https://arb1.arbitrum.io/rpc

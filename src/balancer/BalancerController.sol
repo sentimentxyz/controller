@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "forge-std/console.sol";
 import {IController} from "../core/IController.sol";
 import {IVault, IAsset} from "./IVault.sol";
 
@@ -192,16 +193,17 @@ contract BalancerController is IController {
             )
         );
 
-        if (!isMultiHopSwap(swaps))
-            return (false, new address[](0), new address[](0));
-
         uint tokenInIndex;
         uint tokenOutIndex;
 
         if (kind == IVault.SwapKind.GIVEN_IN) {
+            if (!isMultiHopSwapGivenIn(swaps))
+                return (false, new address[](0), new address[](0));
             tokenInIndex = swaps[swaps.length - 1].assetOutIndex;
             tokenOutIndex = swaps[0].assetInIndex;
         } else {
+            if (!isMultiHopSwapGivenOut(swaps))
+                return (false, new address[](0), new address[](0));
             tokenOutIndex = swaps[swaps.length - 1].assetInIndex;
             tokenInIndex = swaps[0].assetOutIndex;
         }
@@ -241,7 +243,7 @@ contract BalancerController is IController {
         );
     }
 
-    function isMultiHopSwap(IVault.BatchSwapStep[] memory swaps)
+    function isMultiHopSwapGivenIn(IVault.BatchSwapStep[] memory swaps)
         internal
         pure
         returns (bool)
@@ -250,6 +252,22 @@ contract BalancerController is IController {
         for (uint i; i < steps - 1; i++) {
             if (
                 swaps[i].assetOutIndex != swaps[i+1].assetInIndex ||
+                swaps[i+1].amount > 0
+            )
+                return false;
+        }
+        return true;
+    }
+
+    function isMultiHopSwapGivenOut(IVault.BatchSwapStep[] memory swaps)
+        internal
+        pure
+        returns (bool)
+    {
+        uint steps = swaps.length;
+        for (uint i; i < steps - 1; i++) {
+            if (
+                swaps[i].assetInIndex != swaps[i+1].assetOutIndex ||
                 swaps[i+1].amount > 0
             )
                 return false;

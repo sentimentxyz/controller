@@ -148,4 +148,161 @@ contract TestBalancer is TestBase {
         assertEq(tokensOut[0], token);
         assertEq(tokensIn.length, 1);
     }
+
+    function testCanSwap() public {
+        // Setup
+        controllerFacade.toggleTokenAllowance(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+
+        IVault.SingleSwap memory swap = IVault.SingleSwap(
+            "0",
+            0,
+            IAsset(0xCfCA23cA9CA720B6E98E3Eb9B6aa0fFC4a5C08B9),
+            IAsset(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF),
+            0,
+            "0"
+        );
+
+        IVault.FundManagement memory funds = IVault.FundManagement(
+            address(0),
+            false,
+            payable(address(0)),
+            false
+        );
+
+        bytes memory data = abi.encodeWithSelector(0x52bbbe29,
+            swap,
+            funds,
+            0,
+            0
+        );
+
+        // Test
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
+            = controllerFacade.canCall(vault, true, data);
+
+        // Assert
+        assertTrue(canCall);
+        assertEq(tokensOut[0], 0xCfCA23cA9CA720B6E98E3Eb9B6aa0fFC4a5C08B9);
+        assertEq(tokensIn[0], 0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+        assertEq(tokensIn.length, 1);
+        assertEq(tokensOut.length, 1);
+    }
+
+    function testCanBatchSwapGivenIn() public {
+        // Setup
+        controllerFacade.toggleTokenAllowance(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+
+        int256[] memory limits = new int256[](3);
+
+        IAsset[] memory assets = new IAsset[](3);
+        assets[0] = IAsset(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        assets[1] = IAsset(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        assets[2] = IAsset(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+
+        IVault.BatchSwapStep memory swap1 = IVault.BatchSwapStep(
+            "0",
+            0,
+            1,
+            10,
+            "0"
+        );
+
+        IVault.BatchSwapStep memory swap2 = IVault.BatchSwapStep(
+            "0",
+            1,
+            2,
+            0,
+            "0"
+        );
+
+        IVault.FundManagement memory funds = IVault.FundManagement(
+            address(0),
+            false,
+            payable(address(0)),
+            false
+        );
+
+        IVault.BatchSwapStep[] memory swaps = new IVault.BatchSwapStep[](2);
+        swaps[0] = swap1;
+        swaps[1] = swap2;
+
+        bytes memory data = abi.encodeWithSelector(0x945bcec9,
+            IVault.SwapKind.GIVEN_IN,
+            swaps,
+            assets,
+            funds,
+            limits,
+            0
+        );
+
+        // Test
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
+            = controllerFacade.canCall(vault, true, data);
+
+        // Assert
+        assertTrue(canCall);
+        assertEq(tokensOut[0], 0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        assertEq(tokensIn[0], 0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+        assertEq(tokensIn.length, 1);
+        assertEq(tokensOut.length, 1);
+    }
+
+    function testCanBatchSwapGivenOut() public {
+        // Setup
+        controllerFacade.toggleTokenAllowance(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+
+        int256[] memory limits = new int256[](3);
+
+        IAsset[] memory assets = new IAsset[](3);
+        assets[0] = IAsset(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        assets[1] = IAsset(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        assets[2] = IAsset(0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+
+        IVault.BatchSwapStep memory swap1 = IVault.BatchSwapStep(
+            "0",
+            1,
+            2,
+            10,
+            "0"
+        );
+
+        IVault.BatchSwapStep memory swap2 = IVault.BatchSwapStep(
+            "0",
+            0,
+            1,
+            0,
+            "0"
+        );
+
+        IVault.FundManagement memory funds = IVault.FundManagement(
+            address(0),
+            false,
+            payable(address(0)),
+            false
+        );
+
+        IVault.BatchSwapStep[] memory swaps = new IVault.BatchSwapStep[](2);
+        swaps[0] = swap1;
+        swaps[1] = swap2;
+
+        bytes memory data = abi.encodeWithSelector(0x945bcec9,
+            IVault.SwapKind.GIVEN_OUT,
+            swaps,
+            assets,
+            funds,
+            limits,
+            0
+        );
+
+        // Test
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
+            = controllerFacade.canCall(vault, true, data);
+
+        // Assert
+        assertTrue(canCall);
+        assertEq(tokensOut[0], 0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        assertEq(tokensIn[0], 0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF);
+        assertEq(tokensIn.length, 1);
+        assertEq(tokensOut.length, 1);
+    }
 }

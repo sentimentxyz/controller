@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "forge-std/console.sol";
 import {IController} from "../core/IController.sol";
 import {IVault, IAsset} from "./IVault.sol";
 

@@ -47,9 +47,9 @@ contract CurveLPStakingController is IController {
         bytes4 sig = bytes4(data);
 
         if (sig == DEPOSIT) return canDeposit(target);
-        if (sig == DEPOSITCLAIM) return canDepositAndClaim(target);
+        if (sig == DEPOSITCLAIM) return canDepositAndClaim(target, data);
         if (sig == WITHDRAW) return canWithdraw(target);
-        if (sig == WITHDRAWCLAIM) return canWithdrawAndClaim(target);
+        if (sig == WITHDRAWCLAIM) return canWithdrawAndClaim(target, data);
         if (sig == CLAIM) return canClaim(target);
 
         return (false, new address[](0), new address[](0));
@@ -67,11 +67,16 @@ contract CurveLPStakingController is IController {
         return (true, tokensIn, tokensOut);
     }
 
-    function canDepositAndClaim(address target)
+    function canDepositAndClaim(address target, bytes calldata data)
         internal
         view
         returns (bool, address[] memory, address[] memory)
     {
+        (,,bool claim) = abi.decode(
+            data[4:], (uint256, address, bool)
+        );
+        if (!claim) return canDeposit(target);
+
         uint count = IChildGauge(target).reward_count();
 
         address[] memory tokensIn = new address[](count + 1);
@@ -98,11 +103,17 @@ contract CurveLPStakingController is IController {
         return (true, tokensIn, tokensOut);
     }
 
-    function canWithdrawAndClaim(address target)
+    function canWithdrawAndClaim(address target, bytes calldata data)
         internal
         view
         returns (bool, address[] memory, address[] memory)
     {
+        (,,bool claim) = abi.decode(
+            data[4:], (uint256, address, bool)
+        );
+
+        if (!claim) return canWithdraw(target);
+
         uint count = IChildGauge(target).reward_count();
 
         address[] memory tokensIn = new address[](count + 1);

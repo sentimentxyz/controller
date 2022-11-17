@@ -33,18 +33,28 @@ contract ConvexRewardPoolController is IController {
     returns (bool, address[] memory, address[] memory) {
         bytes4 sig = bytes4(data);
 
-        if (sig == WITHDRAW) return canWithdraw(target);
+        if (sig == WITHDRAW) return canWithdraw(target, data[4:]);
         if (sig == GET_REWARD) return canGetReward(target);
 
         return (false, new address[](0), new address[](0));
     }
 
-    function canWithdraw(address rewardPool) 
+    function canWithdraw(address rewardPool, bytes calldata data)
     internal
     view
     returns (bool, address[] memory, address[] memory) {
-        address[] memory tokensIn = new address[](1);
-        tokensIn[0] = ICurveGauge(IRewardPool(rewardPool).curveGauge()).lp_token();
+        (, bool claim) = abi.decode(data, (uint, bool));
+
+        uint rewardsLen = (claim) ? IRewardPool(rewardPool).rewardLength() : 0;
+        address[] memory tokensIn = new address[](rewardsLen + 1);
+
+        if (rewardsLen > 0) {
+            for(uint i; i < rewardsLen; ++i) {
+                tokensIn[i] = IRewardPool(rewardPool).rewards(i).reward_token;
+            }
+        }
+
+        tokensIn[rewardsLen] = ICurveGauge(IRewardPool(rewardPool).curveGauge()).lp_token();
 
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = rewardPool;

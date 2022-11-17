@@ -17,7 +17,7 @@ contract TestConvexController is TestBase {
     address constant CVX = 0xb952A807345991BD529FDded05009F5e80Fe8F45;
     address constant BOOSTER = 0xF403C135812408BFbE8713b5A23a04b3D48AAE31;
     address constant DEPLOYER = 0x947B7742C403f20e5FaCcDAc5E092C943E7D0277;
-    address TRICRYPTO_REWARD_POOL;
+    address constant TRICRYPTO_REWARD_POOL = 0x90927a78ad13C0Ec9ACf546cE0C16248A7E7a86D;
 
     // Curve
     address constant CRV = 0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978;
@@ -32,16 +32,10 @@ contract TestConvexController is TestBase {
     function setUp() public {
         convexBoosterController = new ConvexBoosterController(BOOSTER);
         convexRewardPoolController = new ConvexRewardPoolController();
-
-        vm.prank(DEPLOYER);
-        IBooster(BOOSTER).addPool(TRICRYPTO_LP, TRICRYPTO_GAUGE, CURVE_POOL_FACTORY);
-
-        (,, TRICRYPTO_REWARD_POOL,,) = IBooster(BOOSTER).poolInfo(0);
-        console2.log("TricryptoReward", TRICRYPTO_REWARD_POOL);
     }
 
     function testDeposit() public {
-        bytes memory data = abi.encodeWithSignature("deposit(uint256,uint256)", 0, 0);
+        bytes memory data = abi.encodeWithSignature("deposit(uint256,uint256)", 3, 0);
 
         (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
             = convexBoosterController.canCall(BOOSTER, false, data);
@@ -59,6 +53,19 @@ contract TestConvexController is TestBase {
 
         assertTrue(canCall);
         assertEq(tokensIn[0], TRICRYPTO_LP);
+        assertEq(tokensOut[0], TRICRYPTO_REWARD_POOL);
+    }
+
+    function testWithdrawAndClaim() public {
+        bytes memory data = abi.encodeWithSignature("withdraw(uint256,bool)", 0, true);
+
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
+            = convexRewardPoolController.canCall(TRICRYPTO_REWARD_POOL, false, data);
+        
+        assertTrue(canCall);
+        assertEq(tokensIn[0], CRV);
+        assertEq(tokensIn[1], CVX);
+        assertEq(tokensIn[2], TRICRYPTO_LP);
         assertEq(tokensOut[0], TRICRYPTO_REWARD_POOL);
     }
 

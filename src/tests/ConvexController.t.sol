@@ -11,7 +11,7 @@ interface IBooster {
     function poolInfo(uint256) external view returns (address, address, address, bool, address);
 }
 
-contract TestConvexController is TestBase {
+contract TestConvexControllerArbi is TestBase {
 
     // Convex
     address constant CVX = 0xb952A807345991BD529FDded05009F5e80Fe8F45;

@@ -19,9 +19,9 @@ contract ConvexBoosterController is IController {
     }
 
     function canCall(address, bool, bytes calldata data)
-    external
-    view
-    returns (bool, address[] memory, address[] memory)
+        external
+        view
+        returns (bool, address[] memory, address[] memory)
     {
         bytes4 sig = bytes4(data);
         if (sig == DEPOSIT) return canDeposit(data[4:]);
@@ -29,9 +29,10 @@ contract ConvexBoosterController is IController {
     }
 
     function canDeposit(bytes calldata data)
-    internal
-    view
-    returns (bool, address[] memory, address[] memory) {
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
         (uint pid, ) = abi.decode(data, (uint, uint));
         (address lpToken, , address rewardPool, ,) = IBooster(BOOSTER).poolInfo(pid);
 

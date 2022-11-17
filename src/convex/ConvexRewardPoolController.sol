@@ -28,9 +28,10 @@ contract ConvexRewardPoolController is IController {
     bytes4 GET_REWARD = 0xc00007b0;
 
     function canCall(address target, bool, bytes calldata data)
-    external
-    view
-    returns (bool, address[] memory, address[] memory) {
+        external
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
         bytes4 sig = bytes4(data);
 
         if (sig == WITHDRAW) return canWithdraw(target, data[4:]);
@@ -40,9 +41,10 @@ contract ConvexRewardPoolController is IController {
     }
 
     function canWithdraw(address rewardPool, bytes calldata data)
-    internal
-    view
-    returns (bool, address[] memory, address[] memory) {
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
         (, bool claim) = abi.decode(data, (uint, bool));
 
         uint rewardsLen = (claim) ? IRewardPool(rewardPool).rewardLength() : 0;
@@ -63,9 +65,10 @@ contract ConvexRewardPoolController is IController {
     }
 
     function canGetReward(address rewardPool)
-    internal 
-    view
-    returns (bool, address[] memory, address[] memory) {
+        internal
+        view
+        returns (bool, address[] memory, address[] memory)
+    {
         uint len = IRewardPool(rewardPool).rewardLength();
         address[] memory tokensIn = new address[](len);
 

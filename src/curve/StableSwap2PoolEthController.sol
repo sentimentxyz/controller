@@ -15,14 +15,7 @@ contract StableSwap2PoolEthController is IController {
     /*                             CONSTANT VARIABLES                             */
     /* -------------------------------------------------------------------------- */
 
-    /// @notice index of token in coins[]
-    uint immutable TOKEN_INDEX;
-
-    /// @notice non eth token in pool
-    address[] token;
-
-    /// @notice pool LP token
-    address[] lpToken;
+    address immutable ETH;
 
     /// @notice exchange(int128,int128,uint256,uint256)	function signature
     bytes4 public constant EXCHANGE = 0x3df02124;
@@ -36,10 +29,8 @@ contract StableSwap2PoolEthController is IController {
     /// @notice remove_liquidity_one_coin(uint256,int128,uint256) function signature
     bytes4 public constant REMOVE_LIQUIDITY_ONE_COIN = 0x1a4d01d2;
 
-    constructor(uint tokenIndex, IStableSwapPool pool) {
-        TOKEN_INDEX = tokenIndex;
-        lpToken.push(pool.lp_token());
-        token.push(pool.coins(TOKEN_INDEX));
+    constructor(address _ETH) {
+        ETH = _ETH;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -47,18 +38,18 @@ contract StableSwap2PoolEthController is IController {
     /* -------------------------------------------------------------------------- */
 
     /// @inheritdoc IController
-    function canCall(address, bool useEth, bytes calldata data)
+    function canCall(address target, bool useEth, bytes calldata data)
         external
         view
         returns (bool, address[] memory, address[] memory)
     {
         bytes4 sig = bytes4(data);
 
-        if (sig == ADD_LIQUIDITY) return canAddLiquidity(data);
+        if (sig == ADD_LIQUIDITY) return canAddLiquidity(target, data);
         if (sig == REMOVE_LIQUIDITY_ONE_COIN)
-            return canRemoveLiquidityOneCoin(data);
-        if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity();
-        if (sig == EXCHANGE) return canExchange(useEth);
+            return canRemoveLiquidityOneCoin(target, data);
+        if (sig == REMOVE_LIQUIDITY) return canRemoveLiquidity(target);
+        if (sig == EXCHANGE) return canExchange(target, useEth, data);
 
         return (false, new address[](0), new address[](0));
     }
@@ -67,24 +58,35 @@ contract StableSwap2PoolEthController is IController {
     /*                             INTERNAL FUNCTIONS                             */
     /* -------------------------------------------------------------------------- */
 
-    function canAddLiquidity(bytes calldata data)
+    function canAddLiquidity(address target, bytes calldata data)
         internal
         view
-        returns (bool, address[] memory, address[] memory)
+        returns (bool, address[] memory tokensIn, address[] memory tokensOut)
     {
         (uint[2] memory amounts) = abi.decode(data[4:], (uint[2]));
 
-        if (amounts[TOKEN_INDEX] > 0) {
-            return (true, lpToken, token);
+        tokensIn = new address[](1);
+        tokensIn[0] = IStableSwapPool(target).lp_token();
+
+        address coin;
+        for(uint i; i<2; i++) {
+            if (amounts[i] > 0) {
+                coin = IStableSwapPool(target).coins(i);
+                if (coin != ETH) {
+                    tokensOut = new address[](1);
+                    tokensOut[0] = coin;
+                    return (true, tokensIn, tokensOut);
+                }
+            }
         }
 
-        return (true, lpToken, new address[](0));
+        return (true, tokensIn, tokensOut);
     }
 
-    function canRemoveLiquidityOneCoin(bytes calldata data)
+    function canRemoveLiquidityOneCoin(address target, bytes calldata data)
         internal
         view
-        returns (bool, address[] memory, address[] memory)
+        returns (bool, address[] memory, address[] memory tokensOut)
     {
         (,int128 i, uint256 min_amount) = abi.decode(
             data[4:],
@@ -94,38 +96,73 @@ contract StableSwap2PoolEthController is IController {
         if (min_amount == 0)
             return (false, new address[](0), new address[](0));
 
-        if (TOKEN_INDEX == uint128(i)) {
-            return (true, token, lpToken);
+        tokensOut = new address[](1);
+        tokensOut[0] = IStableSwapPool(target).lp_token();
+
+        address coin = IStableSwapPool(target).coins(uint128(i));
+        if (ETH != coin) {
+            address[] memory tokensIn = new address[](1);
+            tokensIn[0] = coin;
+            return (true, tokensIn, tokensOut);
         }
 
-        return (true, new address[](0), lpToken);
+        return (true, new address[](0), tokensOut);
     }
 
-    function canRemoveLiquidity()
+    function canRemoveLiquidity(address target)
         internal
         view
-        returns (bool, address[] memory, address[] memory)
+        returns (bool, address[] memory tokensIn, address[] memory tokensOut)
     {
-        return (true, token, lpToken);
+        tokensIn = new address[](1);
+        tokensOut = new address[](1);
+
+        tokensOut[0] = IStableSwapPool(target).lp_token();
+
+        address coin;
+        for(uint i; i<2; i++) {
+            coin = IStableSwapPool(target).coins(i);
+            if (coin != ETH) {
+                tokensIn[0] = coin;
+                return (true, tokensIn, tokensOut);
+            }
+        }
+
+        return (false, tokensIn, tokensOut);
     }
 
-    function canExchange(bool useEth)
+    function canExchange(address target, bool useEth, bytes calldata data)
         internal
         view
-        returns (bool, address[] memory, address[] memory)
+        returns (bool, address[] memory tokensIn, address[] memory tokensOut)
     {
+        (int128 i, int128 j,,) = abi.decode(
+            data[4:],
+            (int128, int128, uint256, uint256)
+        );
+
         if (useEth) {
-            return (
-                true,
-                token,
-                new address[](0)
-            );
+            tokensIn = new address[](1);
+            tokensIn[0] = IStableSwapPool(target).coins(uint128(j));
+            return (true, tokensIn, new address[](0));
         }
+
+        address coinIn = IStableSwapPool(target).coins(uint128(j));
+        if (coinIn == ETH) {
+            tokensOut = new address[](1);
+            tokensOut[0] = IStableSwapPool(target).coins(uint128(i));
+            return (true, new address[](0), tokensOut);
+        }
+
+        tokensIn = new address[](1);
+        tokensOut = new address[](1);
+        tokensIn[0] = IStableSwapPool(target).coins(uint128(j));
+        tokensOut[0] = IStableSwapPool(target).coins(uint128(i));
 
         return (
             true,
-            new address[](0),
-            token
+            tokensIn,
+            tokensOut
         );
     }
 }

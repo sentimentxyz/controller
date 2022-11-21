@@ -15,7 +15,7 @@ contract TestStableSwap2PoolEthControllerArbi is TestBase {
 
     function setUp() public {
         setupControllerFacade();
-        curveController = new StableSwap2PoolEthController(1, IStableSwapPool(pool));
+        curveController = new StableSwap2PoolEthController(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
         controllerFacade.updateController(pool, curveController);
     }
 

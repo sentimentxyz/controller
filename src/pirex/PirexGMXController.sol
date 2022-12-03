@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
-import {IPirexGMX} from "./IPirexGMX.sol";
 
 contract PirexGMXController is IController {
 

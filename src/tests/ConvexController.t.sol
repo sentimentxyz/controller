@@ -37,18 +37,20 @@ contract TestConvexControllerArbi is TestBase {
     function testDeposit() public {
         bytes memory data = abi.encodeWithSignature("deposit(uint256,uint256)", 3, 0);
 
-        (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
             = convexBoosterController.canCall(BOOSTER, false, data);
 
         assertTrue(canCall);
         assertEq(tokensIn[0], TRICRYPTO_REWARD_POOL);
+        assertEq(tokensIn[1], CRV);
+        assertEq(tokensIn[2], CVX);
         assertEq(tokensOut[0], TRICRYPTO_LP);
     }
 
     function testWithdraw() public {
         bytes memory data = abi.encodeWithSignature("withdraw(uint256,bool)", 0, false);
 
-        (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
             = convexRewardPoolController.canCall(TRICRYPTO_REWARD_POOL, false, data);
 
         assertTrue(canCall);
@@ -59,9 +61,9 @@ contract TestConvexControllerArbi is TestBase {
     function testWithdrawAndClaim() public {
         bytes memory data = abi.encodeWithSignature("withdraw(uint256,bool)", 0, true);
 
-        (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
             = convexRewardPoolController.canCall(TRICRYPTO_REWARD_POOL, false, data);
-        
+
         assertTrue(canCall);
         assertEq(tokensIn[0], CRV);
         assertEq(tokensIn[1], CVX);
@@ -72,9 +74,9 @@ contract TestConvexControllerArbi is TestBase {
     function testClaim() public {
         bytes memory data = abi.encodeWithSignature("getReward(address)", address(0));
 
-        (bool canCall, address[] memory tokensIn, address[] memory tokensOut) 
+        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
             = convexRewardPoolController.canCall(TRICRYPTO_REWARD_POOL, false, data);
-        
+
         assertTrue(canCall);
         assertEq(tokensIn[0], CRV);
         assertEq(tokensIn[1], CVX);

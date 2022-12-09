@@ -29,7 +29,7 @@ contract TestConvexControllerArbi is TestBase {
     ConvexBoosterController convexBoosterController;
     ConvexRewardPoolController convexRewardPoolController;
 
-    function setUp() public {
+    function setUp() override public {
         convexBoosterController = new ConvexBoosterController(BOOSTER);
         convexRewardPoolController = new ConvexRewardPoolController();
     }

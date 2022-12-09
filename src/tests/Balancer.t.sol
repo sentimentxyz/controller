@@ -11,8 +11,8 @@ contract TestBalancer is TestBase {
 
     address constant vault = 0xBA12222222228d8Ba445958a75a0704d566BF2C8;
 
-    function setUp() public {
-        setupControllerFacade();
+    function setUp() override public {
+        super.setUp();
         balancerController = new BalancerController();
         controllerFacade.updateController(vault, balancerController);
     }

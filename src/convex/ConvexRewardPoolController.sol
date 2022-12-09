@@ -2,21 +2,10 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
+import {IRewardPool} from "./IRewardPool.sol";
 
 interface ICurveGauge {
     function lp_token() external view returns (address);
-}
-
-interface IRewardPool {
-    function curveGauge() external view returns (address);
-    function rewardLength() external view returns (uint256);
-    function rewards(uint index) external view returns (RewardType memory);
-}
-
-struct RewardType {
-    address reward_token;
-    uint128 reward_integral;
-    uint128 reward_remaining;
 }
 
 contract ConvexRewardPoolController is IController {

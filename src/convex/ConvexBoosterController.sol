@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {IController} from "../core/IController.sol";
+import {IRewardPool} from "./IRewardPool.sol";
 
 interface IBooster {
     function poolInfo(uint256) external view returns(address, address, address, bool, address);
@@ -35,9 +36,14 @@ contract ConvexBoosterController is IController {
     {
         (uint pid, ) = abi.decode(data, (uint, uint));
         (address lpToken, , address rewardPool, ,) = IBooster(BOOSTER).poolInfo(pid);
+        uint len = IRewardPool(rewardPool).rewardLength();
 
-        address[] memory tokensIn = new address[](1);
+        address[] memory tokensIn = new address[](len + 1);
         tokensIn[0] = rewardPool;
+
+        for(uint i = 1; i <= len; ++i) {
+            tokensIn[i] = IRewardPool(rewardPool).rewards(i - 1).reward_token;
+        }
 
         address[] memory tokensOut = new address[](1);
         tokensOut[0] = lpToken;

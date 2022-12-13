@@ -31,8 +31,6 @@ interface IPirexGMX {
         uint256 minGlp,
         address receiver
     ) external returns (uint256, uint256, uint256);
-
-    function depositGmx(uint256 amount, address receiver) external returns (uint256, uint256, uint256);
 }
 
 contract TestPirexGMXController is TestBase {
@@ -40,34 +38,12 @@ contract TestPirexGMXController is TestBase {
     PirexGMXController vaultController;
 
     address target = makeAddr("target");
-    address PXGMX = makeAddr("PXGMX");
     address PXGLP = makeAddr("PXGLP");
-    address GMX = makeAddr("GMX");
 
     function setUp() public {
         setupControllerFacade();
-        vaultController = new PirexGMXController(PXGMX, PXGLP, GMX);
+        vaultController = new PirexGMXController(PXGLP);
         controllerFacade.updateController(target, vaultController);
-    }
-
-    function testDepositGMX(address receiver, uint64 amt) public {
-        // Setup
-        controllerFacade.toggleTokenAllowance(PXGMX);
-
-        bytes memory data = abi.encodeWithSelector(
-            IPirexGMX.depositGmx.selector,
-            receiver,
-            amt
-        );
-
-        // Test
-        (bool canCall, address[] memory tokensIn, address[] memory tokensOut)
-            = controllerFacade.canCall(target, false, data);
-
-        // Assert
-        assertTrue(canCall);
-        assertEq(tokensIn[0], PXGMX);
-        assertEq(tokensOut[0], GMX);
     }
 
     function testDepositGLPETH(address receiver, uint64 amt, uint64 amt2) public {

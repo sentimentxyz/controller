@@ -9,9 +9,6 @@ contract PirexGMXController is IController {
     /*                             CONSTANT VARIABLES                             */
     /* -------------------------------------------------------------------------- */
 
-    /// @notice depositGmx(uint256,address) function signature
-    bytes4 public constant DEPOSITGMX = 0x437a8d0a;
-
     /// @notice depositGlpETH(uint256,uint256,address) function signature
     bytes4 public constant DEPOSITGLPETH = 0xf64d0094;
 
@@ -24,14 +21,8 @@ contract PirexGMXController is IController {
     /// @notice redeemPxGlpETH(uint256,uint256,address) function signature
     bytes4 public constant REDEEMPXGLPETH = 0x6151f1b7;
 
-    /// @notice address of PXGMX
-    address immutable PXGMX;
-
     /// @notice address of PXGLP
     address immutable PXGLP;
-
-    /// @notice address of GMX
-    address immutable GMX;
 
     /* -------------------------------------------------------------------------- */
     /*                                 CONSTRUCTOR                                */
@@ -39,13 +30,10 @@ contract PirexGMXController is IController {
 
     /**
         @notice Contract constructor
-        @param _PXGMX address of PXGMX
         @param _PXGLP address of PXGLP
     */
-    constructor(address _PXGMX, address _PXGLP, address _GMX) {
+    constructor(address _PXGLP) {
         PXGLP = _PXGLP;
-        PXGMX = _PXGMX;
-        GMX = _GMX;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -59,24 +47,11 @@ contract PirexGMXController is IController {
         returns (bool, address[] memory, address[] memory)
     {
         bytes4 sig = bytes4(data);
-        if (sig == DEPOSITGMX) return canCallDepositGMX();
         if (sig == DEPOSITGLPETH) return canCallDepositGLPETH(useEth);
         if (sig == DEPOSITGLP) return canCallDepositGLP(data[4:]);
         if (sig == REDEEMPXGLP) return canCallRedeemPXGLP(data[4:]);
         if (sig == REDEEMPXGLPETH) return canCallRedeemPXGLPETH();
         return (false, new address[](0), new address[](0));
-    }
-
-    function canCallDepositGMX()
-        internal
-        view
-        returns (bool, address[] memory tokensIn, address[] memory tokensOut)
-    {
-        tokensIn = new address[](1);
-        tokensOut = new address[](1);
-        tokensIn[0] = PXGMX;
-        tokensOut[0] = GMX;
-        return (true, tokensIn, tokensOut);
     }
 
     function canCallDepositGLPETH(bool useEth)

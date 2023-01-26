@@ -8,7 +8,7 @@ contract TestBase is Test {
 
     ControllerFacade controllerFacade;
 
-    function setupControllerFacade() public {
+    function setUp() virtual public {
         controllerFacade = new ControllerFacade();
     }
 }

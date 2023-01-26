@@ -13,8 +13,8 @@ contract TestBalancerStakingArbi is TestBase {
     address constant r1 = 0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8;
     address constant r2 = 0x13Ad51ed4F1B7e9Dc168d8a00cB3f4dDD85EfA60;
 
-    function setUp() public {
-        setupControllerFacade();
+    function setUp() override public {
+        super.setUp();
         balancerController = new BalancerLPStakingController();
         controllerFacade.updateController(gauge, balancerController);
     }

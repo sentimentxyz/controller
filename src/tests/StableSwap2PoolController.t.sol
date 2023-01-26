@@ -13,8 +13,8 @@ contract TestStableSwap2PoolEthControllerArbi is TestBase {
     address constant lp = 0xDbcD16e622c95AcB2650b38eC799f76BFC557a0b;
     address constant WSTETH = 0x5979D7b546E38E414F7E9822514be443A4800529;
 
-    function setUp() public {
-        setupControllerFacade();
+    function setUp() override public {
+        super.setUp();
         curveController = new StableSwap2PoolEthController(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
         controllerFacade.updateController(pool, curveController);
     }

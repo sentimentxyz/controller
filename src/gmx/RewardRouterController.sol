@@ -4,11 +4,10 @@ pragma solidity ^0.8.17;
 import {IController} from "../core/IController.sol";
 
 /**
-    @title Reward Router Controller for claiming and compounding rewards
-    @dev arbi:0xA906F338CB21815cBc4Bc87ace9e68c87eF8d8F1
-*/
+ * @title Reward Router Controller for claiming and compounding rewards
+ *     @dev arbi:0xA906F338CB21815cBc4Bc87ace9e68c87eF8d8F1
+ */
 contract RewardRouterController is IController {
-
     /* -------------------------------------------------------------------------- */
     /*                              STORAGE VARIABLES                             */
     /* -------------------------------------------------------------------------- */
@@ -51,19 +50,11 @@ contract RewardRouterController is IController {
     /*                             INTERNAL FUNCTIONS                             */
     /* -------------------------------------------------------------------------- */
 
-    function canCallClaimFees()
-        internal
-        view
-        returns (bool, address[] memory, address[] memory)
-    {
+    function canCallClaimFees() internal view returns (bool, address[] memory, address[] memory) {
         return (true, WETH, new address[](0));
     }
 
-    function canCallCompound()
-        internal
-        view
-        returns (bool, address[] memory, address[] memory)
-    {
-        return (true, WETH, new address[](0));
+    function canCallCompound() internal pure returns (bool, address[] memory, address[] memory) {
+        return (true, new address[](0), new address[](0));
     }
 }

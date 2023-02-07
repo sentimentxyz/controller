@@ -6,29 +6,15 @@ import {DepositPeripheryController} from "../rage/DepositPeripheryController.sol
 import {WithdrawPeripheryController} from "../rage/WithdrawPeripheryController.sol";
 
 interface DNGMXVault {
-    function withdrawToken(
-        address token,
-        address receiver,
-        uint256 sGlpAmount
-    ) external returns (uint256 amountOut);
+    function withdrawToken(address token, address receiver, uint256 sGlpAmount) external returns (uint256 amountOut);
 
-    function redeemToken(
-        address token,
-        address receiver,
-        uint256 sharesAmount
-    ) external returns (uint256 amountOut);
+    function redeemToken(address token, address receiver, uint256 sharesAmount) external returns (uint256 amountOut);
 
-    function depositToken(
-        address token,
-        address receiver,
-        uint256 tokenAmount
-    ) external returns (uint256 sharesReceived);
+    function depositToken(address token, address receiver, uint256 tokenAmount)
+        external
+        returns (uint256 sharesReceived);
 
-    function deposit(
-        address token,
-        address receiver,
-        uint256 tokenAmount
-    ) external returns (uint256 sharesReceived);
+    function deposit(address token, address receiver, uint256 tokenAmount) external returns (uint256 sharesReceived);
 }
 
 contract TestDNGMXVaultController is TestBase {
@@ -58,12 +44,7 @@ contract TestDNGMXVaultController is TestBase {
         // Setup
         controllerFacade.toggleTokenAllowance(vault);
 
-        bytes memory data = abi.encodeWithSelector(
-            DNGMXVault.depositToken.selector,
-            token,
-            receiver,
-            amt
-        );
+        bytes memory data = abi.encodeWithSelector(DNGMXVault.depositToken.selector, token, receiver, amt);
 
         // Test
         (
@@ -84,12 +65,7 @@ contract TestDNGMXVaultController is TestBase {
         uint64 amt
     ) public {
         // Setup
-        bytes memory data = abi.encodeWithSelector(
-            DNGMXVault.withdrawToken.selector,
-            token,
-            receiver,
-            amt
-        );
+        bytes memory data = abi.encodeWithSelector(DNGMXVault.withdrawToken.selector, token, receiver, amt);
 
         // Test
         (bool canCall, , ) = controllerFacade.canCall(
@@ -110,12 +86,7 @@ contract TestDNGMXVaultController is TestBase {
         // Setup
         controllerFacade.toggleTokenAllowance(token);
 
-        bytes memory data = abi.encodeWithSelector(
-            DNGMXVault.withdrawToken.selector,
-            token,
-            receiver,
-            amt
-        );
+        bytes memory data = abi.encodeWithSelector(DNGMXVault.withdrawToken.selector, token, receiver, amt);
 
         // Test
         (
@@ -138,12 +109,7 @@ contract TestDNGMXVaultController is TestBase {
         // Setup
         controllerFacade.toggleTokenAllowance(token);
 
-        bytes memory data = abi.encodeWithSelector(
-            DNGMXVault.redeemToken.selector,
-            token,
-            receiver,
-            amt
-        );
+        bytes memory data = abi.encodeWithSelector(DNGMXVault.redeemToken.selector, token, receiver, amt);
 
         // Test
         (

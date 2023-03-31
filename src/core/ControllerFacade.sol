@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {Ownable} from "../utils/Ownable.sol";
+import {IController} from "./IController.sol";
 
 /**
  * @title Controller Facade
@@ -12,6 +13,9 @@ contract ControllerFacade is Ownable {
     /* -------------------------------------------------------------------------- */
     /*                               STATE VARIABLES                              */
     /* -------------------------------------------------------------------------- */
+
+    /// Mapping of external interaction with respective controller
+    mapping(address => IController) public controllerFor;
 
     /// Mapping that returns if a given token is supported by the protocol
     mapping(address => bool) public isTokenAllowed;
@@ -26,6 +30,7 @@ contract ControllerFacade is Ownable {
     /*                                   EVENTS                                   */
     /* -------------------------------------------------------------------------- */
 
+    event UpdateController(address indexed target, address indexed controller);
     event UpdateWhitelist(address indexed target, bytes4 sig, bool isWhitelisted);
     event UpdateApproval(address indexed target, bool isApproveAllowed);
     event UpdateTokenAllowance(address indexed token, bool isTokenAllowed);
@@ -43,12 +48,32 @@ contract ControllerFacade is Ownable {
     /*                              PUBLIC FUNCTIONS                              */
     /* -------------------------------------------------------------------------- */
 
+    function canCall(address target, bool useEth, bytes calldata data)
+        external
+        view
+        returns (bool isValid, address[] memory tokensIn, address[] memory tokensOut)
+    {
+        (isValid, tokensIn, tokensOut) = controllerFor[target].canCall(target, useEth, data);
+        if (isValid) isValid = validateTokensIn(tokensIn);
+    }
+
     function canCall(address target, bytes4 sig) external view returns (bool) {
         return isActionWhitelisted[target][sig];
     }
 
     function canApprove(address target) external view returns (bool) {
         return isApproveAllowed[target];
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                              INTERNAL FUNCTIONS                            */
+    /* -------------------------------------------------------------------------- */
+
+    function validateTokensIn(address[] memory tokensIn) internal view returns (bool) {
+        for (uint256 i; i < tokensIn.length; i++) {
+            if (!isTokenAllowed[tokensIn[i]]) return false;
+        }
+        return true;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -65,8 +90,13 @@ contract ControllerFacade is Ownable {
         emit UpdateApproval(target, isAllowed);
     }
 
-    function toggleTokenAllowance(address token, bool isAllowed) external adminOnly {
-        isTokenAllowed[token] = isAllowed;
-        emit UpdateTokenAllowance(token, isAllowed);
+    function toggleTokenAllowance(address token) external adminOnly {
+        isTokenAllowed[token] = !isTokenAllowed[token];
+        emit UpdateTokenAllowance(token, isTokenAllowed[token]);
+    }
+
+    function updateController(address target, IController controller) external adminOnly {
+        controllerFor[target] = IController(controller);
+        emit UpdateController(target, address(controller));
     }
 }

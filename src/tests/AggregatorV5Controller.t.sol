@@ -37,7 +37,7 @@ interface AggregatorV5 {
     ) external payable returns (uint256 returnAmount);
 }
 
-contract TestAggregatorV5Controller is TestBase {
+contract TestAggregatorV5ControllerArbi is TestBase {
     AggregatorV5Controller aggregatorV5Controller;
 
     address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;

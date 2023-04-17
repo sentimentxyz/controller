@@ -21,7 +21,7 @@ interface IUniswapPool {
     function token1() external view returns (address);
 }
 
-contract AggregatorV5ControllerArbi is IController {
+contract AggregatorV5Controller is IController {
     /// @notice swap(address executor,tuple desc,bytes permit,bytes data)
     bytes4 constant SWAP = 0x12aa3caf;
 

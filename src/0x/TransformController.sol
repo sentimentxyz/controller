@@ -35,8 +35,8 @@ contract TransformController is IController {
             return (false, new address[](0), new address[](0));
         }
 
-        (address tokenOut, address tokenIn,,,) =
-            abi.decode(data[4:], (address, address, uint256, uint256, ITransformERC20Feature.Transformation[]));
+        (address tokenOut, address tokenIn) =
+            abi.decode(data[4:], (address, address));
 
         if (tokenIn == ETH) {
             tokensOut = new address[](1);

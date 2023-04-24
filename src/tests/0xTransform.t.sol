@@ -19,6 +19,7 @@ contract TestTransformController is TestBase {
     }
 
     function testCanTranformERC20(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut) public {
+        vm.assume(tokenIn != ETH && tokenOut != ETH);
         // Setup
         controllerFacade.toggleTokenAllowance(tokenIn);
 
@@ -47,6 +48,7 @@ contract TestTransformController is TestBase {
     }
 
     function testCanTranformETHtoERC20(address tokenIn, uint256 amountIn, uint256 amountOut) public {
+        vm.assume(tokenIn != ETH);
         // Setup
         controllerFacade.toggleTokenAllowance(tokenIn);
 
@@ -67,6 +69,7 @@ contract TestTransformController is TestBase {
     }
 
     function testCanTranformERC20ToETH(address tokenOut, uint256 amountIn, uint256 amountOut) public {
+        vm.assume(tokenOut != ETH);
         ITransformERC20Feature.Transformation[] memory transformations = new ITransformERC20Feature.Transformation[](1);
 
         bytes memory data = abi.encodeWithSelector(

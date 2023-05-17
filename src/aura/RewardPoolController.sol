@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import {IController} from "../core/IController.sol";
 import {IERC4626} from "../erc4626/IERC4626.sol";
 import {IRewards} from "./IRewards.sol";
+import {IBooster} from "./IBooster.sol";
 
 /**
  * @title Aura reward pool controller
@@ -68,26 +69,21 @@ contract RewardPoolController is IController {
         view
         returns (bool, address[] memory, address[] memory)
     {
-        uint256 rewardLength = IRewards(target).extraRewardsLength();
-        address[] memory tokensIn = new address[](rewardLength + 2);
-        for (uint256 i = 0; i < rewardLength; i++) {
-            tokensIn[i] = IRewards(IRewards(target).extraRewards(i)).rewardToken();
-        }
-        tokensIn[rewardLength] = IERC4626(target).asset();
-        tokensIn[rewardLength + 1] = IRewards(target).rewardToken();
-
+        address[] memory tokensIn = new address[](1);
         address[] memory tokensOut = new address[](1);
+        tokensIn[0] = IERC4626(target).asset();
         tokensOut[0] = target;
         return (true, tokensIn, tokensOut);
     }
 
     function canCallGetReward(address target) internal view returns (bool, address[] memory, address[] memory) {
         uint256 rewardLength = IRewards(target).extraRewardsLength();
-        address[] memory tokensIn = new address[](rewardLength + 1);
+        address[] memory tokensIn = new address[](rewardLength + 2);
         for (uint256 i = 0; i < rewardLength; i++) {
             tokensIn[i] = IRewards(IRewards(target).extraRewards(i)).rewardToken();
         }
         tokensIn[rewardLength] = IRewards(target).rewardToken();
+        tokensIn[rewardLength + 1] = IBooster(IRewards(target).operator()).minter();
         return (true, tokensIn, new address[](0));
     }
 }

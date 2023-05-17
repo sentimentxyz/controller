@@ -12,6 +12,7 @@ contract TestRewardPoolControllerMainnet is TestBase {
     address target = 0xe4683Fe8F53da14cA5DAc4251EaDFb3aa614d528;
     address BAL = 0xba100000625a3754423978a60c9317c58a424e3D;
     address LDO = 0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32;
+    address AURA = 0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF;
 
     function setUp() public override {
         super.setUp();
@@ -53,8 +54,6 @@ contract TestRewardPoolControllerMainnet is TestBase {
 
     function testCanRedeem(uint256 shares, address sender) public {
         // Setup
-        controllerFacade.toggleTokenAllowance(LDO);
-        controllerFacade.toggleTokenAllowance(BAL);
         controllerFacade.toggleTokenAllowance(IERC4626(target).asset());
 
         bytes memory data = abi.encodeWithSelector(0xba087652, shares, sender, sender);
@@ -65,19 +64,14 @@ contract TestRewardPoolControllerMainnet is TestBase {
 
         // Assert
         assertTrue(canCall);
-        assertEq(tokensIn.length, IRewards(target).extraRewardsLength() + 2);
-        assertEq(tokensIn[0], LDO);
-        assertEq(tokensIn[1], IERC4626(target).asset());
-        assertEq(tokensIn[2], BAL);
-        assertEq(tokensOut[0], target);
+        assertEq(tokensIn.length, 1);
         assertEq(tokensOut.length, 1);
-
+        assertEq(tokensIn[0], IERC4626(target).asset());
+        assertEq(tokensOut[0], target);
     }
 
     function testCanWithdraw(uint256 assets, address sender) public {
         // Setup
-        controllerFacade.toggleTokenAllowance(LDO);
-        controllerFacade.toggleTokenAllowance(BAL);
         controllerFacade.toggleTokenAllowance(IERC4626(target).asset());
 
         bytes memory data = abi.encodeWithSelector(0xb460af94, assets, sender, sender);
@@ -88,19 +82,17 @@ contract TestRewardPoolControllerMainnet is TestBase {
 
         // Assert
         assertTrue(canCall);
-        assertEq(tokensIn.length, IRewards(target).extraRewardsLength() + 2);
-        assertEq(tokensIn[0], LDO);
-        assertEq(tokensIn[1], IERC4626(target).asset());
-        assertEq(tokensIn[2], BAL);
-        assertEq(tokensOut[0], target);
+        assertEq(tokensIn.length, 1);
         assertEq(tokensOut.length, 1);
+        assertEq(tokensIn[0], IERC4626(target).asset());
+        assertEq(tokensOut[0], target);
     }
 
     function testCanGetRewards() public {
         // Setup
         controllerFacade.toggleTokenAllowance(LDO);
         controllerFacade.toggleTokenAllowance(BAL);
-        controllerFacade.toggleTokenAllowance(IERC4626(target).asset());
+        controllerFacade.toggleTokenAllowance(AURA);
 
         bytes memory data = abi.encodeWithSelector(0x3d18b912);
 
@@ -113,6 +105,7 @@ contract TestRewardPoolControllerMainnet is TestBase {
         assertEq(tokensOut.length, 0);
         assertEq(tokensIn[0], LDO);
         assertEq(tokensIn[1], BAL);
-        assertEq(tokensIn.length, 2);
+        assertEq(tokensIn[2], AURA);
+        assertEq(tokensIn.length, 3);
     }
 }

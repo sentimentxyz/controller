@@ -2,9 +2,9 @@ name: Compile and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   check:
@@ -21,7 +21,7 @@ jobs:
           version: nightly
 
       - name: Run tests
-        run: forge test --no-match-contract Arbi --fork-url https://rpc.ankr.com/eth
+        run: forge test --no-match-contract Arbi --fork-url https://eth.llamarpc.com
 
       - name: Run arbitrum tests
         run: forge test --mc Arbi --fork-url  https://arb1.arbitrum.io/rpc

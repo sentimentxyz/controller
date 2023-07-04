@@ -20,5 +20,6 @@ gmx/RewardRouterV2Controller: [0x3e1C3E175eba948eb74a68C2f946678A863550CE](https
 uniswap/UniV2Controller: [0x6Df0b4F7E3056d52Fff8D9d3B5E45b4E29ee7Bfd](https://arbiscan.io/address/0x6Df0b4F7E3056d52Fff8D9d3B5E45b4E29ee7Bfd)\
 uniswap/UniV3Controller: [0x4f0da4c622C07D126c87fD3fA9B93Bf5721f9edB](https://arbiscan.io/address/0x4f0da4c622C07D126c87fD3fA9B93Bf5721f9edB)\
 weth/WethController: [0x697cfba173537f9C59FeE745Bbd8A4A28F5381cc](https://arbiscan.io/address/0x697cfba173537f9C59FeE745Bbd8A4A28F5381cc)\
+aura/RewardPoolController: [0x2AB248C6A51261ef86BB99fa0C210B097349d628](https://arbiscan.io/address/0x2AB248C6A51261ef86BB99fa0C210B097349d628)\
 
 ---

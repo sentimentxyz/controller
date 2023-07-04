@@ -5,6 +5,7 @@ import {IController} from "../core/IController.sol";
 import {IERC4626} from "../erc4626/IERC4626.sol";
 import {IRewards} from "./IRewards.sol";
 import {IBooster} from "./IBooster.sol";
+import {IStashToken} from "./IStashToken.sol";
 
 /**
  * @title Aura reward pool controller
@@ -28,6 +29,8 @@ contract RewardPoolController is IController {
 
     /// @notice getReward()
     bytes4 constant GET_REWARD = 0x3d18b912;
+
+    address public immutable AURA = 0x1509706a6c66CA549ff0cB464de88231DDBe213B;
 
     /* -------------------------------------------------------------------------- */
     /*                              PUBLIC FUNCTIONS                              */
@@ -80,10 +83,10 @@ contract RewardPoolController is IController {
         uint256 rewardLength = IRewards(target).extraRewardsLength();
         address[] memory tokensIn = new address[](rewardLength + 2);
         for (uint256 i = 0; i < rewardLength; i++) {
-            tokensIn[i] = IRewards(IRewards(target).extraRewards(i)).rewardToken();
+            tokensIn[i] = IStashToken(IRewards(IRewards(target).extraRewards(i)).rewardToken()).baseToken();
         }
         tokensIn[rewardLength] = IRewards(target).rewardToken();
-        tokensIn[rewardLength + 1] = IBooster(IRewards(target).operator()).minter();
+        tokensIn[rewardLength + 1] = AURA;
         return (true, tokensIn, new address[](0));
     }
 }

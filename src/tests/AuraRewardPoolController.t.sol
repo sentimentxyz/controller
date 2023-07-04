@@ -6,13 +6,13 @@ import {RewardPoolController} from "../aura/RewardPoolController.sol";
 import {IERC4626} from "../erc4626/IERC4626.sol";
 import {IRewards} from "../aura/IRewards.sol";
 
-contract TestRewardPoolControllerMainnet is TestBase {
+contract TestRewardPoolControllerArbi is TestBase {
     RewardPoolController rewardPoolController;
 
-    address target = 0xe4683Fe8F53da14cA5DAc4251EaDFb3aa614d528;
-    address BAL = 0xba100000625a3754423978a60c9317c58a424e3D;
-    address LDO = 0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32;
-    address AURA = 0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF;
+    address target = 0x49e998899FF11598182918098588E8b90d7f60D3;
+    address BAL = 0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8;
+    address ARB = 0x912CE59144191C1204E64559FE8253a0e49E6548;
+    address AURA = 0x1509706a6c66CA549ff0cB464de88231DDBe213B;
 
     function setUp() public override {
         super.setUp();
@@ -90,7 +90,7 @@ contract TestRewardPoolControllerMainnet is TestBase {
 
     function testCanGetRewards() public {
         // Setup
-        controllerFacade.toggleTokenAllowance(LDO);
+        controllerFacade.toggleTokenAllowance(ARB);
         controllerFacade.toggleTokenAllowance(BAL);
         controllerFacade.toggleTokenAllowance(AURA);
 
@@ -103,7 +103,7 @@ contract TestRewardPoolControllerMainnet is TestBase {
         // Assert
         assertTrue(canCall);
         assertEq(tokensOut.length, 0);
-        assertEq(tokensIn[0], LDO);
+        assertEq(tokensIn[0], ARB);
         assertEq(tokensIn[1], BAL);
         assertEq(tokensIn[2], AURA);
         assertEq(tokensIn.length, 3);
